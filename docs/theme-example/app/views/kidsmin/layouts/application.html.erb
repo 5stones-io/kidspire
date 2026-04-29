@@ -1,0 +1,44 @@
+<%#
+  Example layout override — place this at the same path in your host app or theme gem.
+  Rails automatically uses this instead of the engine's default layout.
+  Copy the engine's original and modify only what you need.
+%>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title><%= content_for?(:title) ? yield(:title) + " — My Church Kids" : "My Church Kids" %></title>
+
+    <%# Load custom fonts before the theme CSS %>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+3&display=swap" />
+
+    <%# kidsmin default variables (required) %>
+    <%= stylesheet_link_tag "kidsmin/default_theme", media: "all" %>
+
+    <%# Your overrides — loaded after defaults so they win %>
+    <%= stylesheet_link_tag "my_church_theme", media: "all" %>
+
+    <%= vite_client_tag %>
+    <%= vite_javascript_tag "application", defer: true %>
+  </head>
+
+  <body class="bg-[var(--kidsmin-color-background)] text-[var(--kidsmin-color-text)] antialiased">
+    <%# Example: add a custom church header above the React app %>
+    <header class="bg-[var(--kidsmin-color-primary)] text-[var(--kidsmin-color-primary-fg)] px-6 py-3">
+      <p class="text-sm font-semibold">My Church · Kids Ministry</p>
+    </header>
+
+    <div id="root"></div>
+
+    <script>
+      window.__KIDSMIN_CONFIG__ = {
+        supabaseUrl:     "<%= Kidsmin.configuration.supabase_url %>",
+        supabaseAnonKey: "<%= Kidsmin.configuration.supabase_anon_key %>",
+        apiBaseUrl:      "<%= Kidsmin.configuration.frontend_base_url || "" %>/api/v1"
+      };
+    </script>
+  </body>
+</html>

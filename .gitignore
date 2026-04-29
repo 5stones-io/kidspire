@@ -1,0 +1,36 @@
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Rails
+log/
+tmp/
+storage/
+public/assets/
+public/vite/
+public/vite-dev/
+public/vite-test/
+config/master.key
+config/credentials/*.key
+
+# Ruby
+.bundle/
+vendor/bundle/
+*.gem
+
+# Node
+node_modules/
+bun.lockb
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# SAMPLE
+sample/

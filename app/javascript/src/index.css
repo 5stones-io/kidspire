@@ -1,0 +1,118 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Map --kidsmin-* CSS variables to Tailwind 4 token names.
+   Church themes override the --kidsmin-* vars; Tailwind classes update automatically. */
+@theme inline {
+  --font-sans:    var(--kidsmin-font-body);
+  --font-display: var(--kidsmin-font-heading);
+
+  --radius-sm:  calc(var(--kidsmin-radius) - 8px);
+  --radius-md:  calc(var(--kidsmin-radius) - 4px);
+  --radius-lg:  var(--kidsmin-radius);
+  --radius-xl:  calc(var(--kidsmin-radius) + 4px);
+  --radius-2xl: calc(var(--kidsmin-radius) + 8px);
+  --radius-3xl: calc(var(--kidsmin-radius) + 16px);
+  --radius-4xl: calc(var(--kidsmin-radius) + 24px);
+
+  --color-background:           var(--kidsmin-color-background);
+  --color-foreground:           var(--kidsmin-color-text);
+  --color-card:                 var(--kidsmin-color-surface);
+  --color-card-foreground:      var(--kidsmin-color-text);
+  --color-popover:              var(--kidsmin-color-surface);
+  --color-popover-foreground:   var(--kidsmin-color-text);
+  --color-primary:              var(--kidsmin-color-primary);
+  --color-primary-foreground:   var(--kidsmin-color-primary-fg);
+  --color-secondary:            var(--kidsmin-color-secondary);
+  --color-secondary-foreground: var(--kidsmin-color-text);
+  --color-muted:                var(--kidsmin-color-secondary);
+  --color-muted-foreground:     var(--kidsmin-color-text-muted);
+  --color-accent:               var(--kidsmin-color-accent);
+  --color-accent-foreground:    var(--kidsmin-color-accent-fg);
+  --color-destructive:          var(--kidsmin-color-error);
+  --color-destructive-foreground: oklch(0.99 0.01 85);
+  --color-border:               var(--kidsmin-color-border);
+  --color-input:                var(--kidsmin-color-border);
+  --color-ring:                 var(--kidsmin-color-primary);
+
+  --color-sky-soft:  var(--kidsmin-color-sky-soft);
+  --color-pink-soft: var(--kidsmin-color-pink-soft);
+  --color-mint-soft: var(--kidsmin-color-mint-soft);
+  --color-cream:     var(--kidsmin-color-cream);
+}
+
+/* kidsmin CSS variable contract — church themes override these */
+:root {
+  --kidsmin-font-heading: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  --kidsmin-font-body:    'Nunito', system-ui, sans-serif;
+
+  --kidsmin-color-primary:      oklch(0.4 0.2 290);
+  --kidsmin-color-primary-fg:   oklch(0.99 0.01 85);
+  --kidsmin-color-accent:       oklch(0.82 0.17 80);
+  --kidsmin-color-accent-fg:    oklch(0.25 0.06 290);
+
+  --kidsmin-color-background:   oklch(0.985 0.012 85);
+  --kidsmin-color-surface:      oklch(1 0 0);
+  --kidsmin-color-secondary:    oklch(0.95 0.04 295);
+  --kidsmin-color-cream:        oklch(0.97 0.03 85);
+
+  --kidsmin-color-text:         oklch(0.22 0.05 290);
+  --kidsmin-color-text-muted:   oklch(0.5 0.03 285);
+  --kidsmin-color-text-inverse: oklch(0.99 0.01 85);
+
+  --kidsmin-color-border:    oklch(0.92 0.03 290);
+  --kidsmin-color-error:     oklch(0.6 0.22 25);
+
+  --kidsmin-color-sky-soft:  oklch(0.92 0.06 230);
+  --kidsmin-color-pink-soft: oklch(0.92 0.06 10);
+  --kidsmin-color-mint-soft: oklch(0.92 0.07 160);
+
+  --kidsmin-radius: 1.5rem;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+}
+
+@layer utilities {
+  .bg-gradient-hero {
+    background-image:
+      radial-gradient(circle at 15% 20%, color-mix(in oklab, var(--color-accent) 40%, transparent), transparent 55%),
+      radial-gradient(circle at 85% 10%, color-mix(in oklab, var(--color-sky-soft) 80%, transparent), transparent 55%),
+      radial-gradient(circle at 80% 90%, color-mix(in oklab, var(--color-pink-soft) 70%, transparent), transparent 55%),
+      linear-gradient(135deg, color-mix(in oklab, var(--color-primary) 90%, black), var(--color-primary));
+  }
+
+  .bg-gradient-soft {
+    background-image: linear-gradient(135deg, var(--color-cream), color-mix(in oklab, var(--color-sky-soft) 60%, white));
+  }
+
+  .shadow-playful {
+    box-shadow: 0 18px 40px -20px color-mix(in oklab, var(--color-primary) 45%, transparent);
+  }
+
+  .shadow-pop {
+    box-shadow: 0 10px 0 -4px color-mix(in oklab, var(--color-primary) 25%, transparent);
+  }
+
+  .dot-overlay {
+    background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0);
+    background-size: 24px 24px;
+  }
+}

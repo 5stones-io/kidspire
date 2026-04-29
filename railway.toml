@@ -1,0 +1,7 @@
+[build]
+builder = "nixpacks"
+buildCommand = "bundle install && npm install && npm run build && bundle exec rails assets:precompile 2>/dev/null || true"
+
+[deploy]
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3

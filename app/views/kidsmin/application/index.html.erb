@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>kidsmin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
+    <% if Rails.env.development? %>
+      <script type="module" src="http://localhost:3036/@vite/client"></script>
+      <script type="module" src="http://localhost:3036/app/javascript/application.tsx"></script>
+    <% else %>
+      <%# production: link to built manifest assets %>
+    <% end %>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      window.__KIDSMIN_CONFIG__ = {
+        supabaseUrl:     "<%= Kidsmin.configuration.supabase_url %>",
+        supabaseAnonKey: "<%= Kidsmin.configuration.supabase_anon_key %>",
+        apiBaseUrl:      "<%= request.base_url %>/api/v1"
+      };
+    </script>
+  </body>
+</html>

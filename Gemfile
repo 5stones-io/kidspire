@@ -1,0 +1,29 @@
+source "https://rubygems.org"
+
+ruby "~> 3.3"
+
+gemspec
+
+gem "puma",        ">= 5.0"
+gem "kaminari"
+gem "blueprinter"
+gem "jwt"
+gem "httparty"
+gem "sidekiq",     "~> 7.0", require: false
+gem "redis",       "~> 5.0", require: false
+gem "rack-cors"
+gem "rack-attack"
+
+gem "bootsnap", require: false
+gem "dotenv-rails", groups: [:development, :test]
+
+group :development, :test do
+  gem "debug", platforms: %i[mri mswin]
+  gem "rspec-rails"
+  gem "factory_bot_rails"
+  gem "faker"
+end
+
+group :development do
+  gem "rubocop-rails-omakase", require: false
+end

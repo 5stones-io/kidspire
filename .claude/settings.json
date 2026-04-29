@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl http://localhost:3000*)",
+      "Bash(curl http://localhost:3036*)",
+      "Bash(bundle exec rails routes*)",
+      "Bash(bundle exec rails db:*)",
+      "Bash(bundle exec puma*)"
+    ]
+  }
+}
