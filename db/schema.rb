@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_04_28_000010) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_28_000011) do
   create_schema "auth"
   create_schema "extensions"
   create_schema "graphql"
@@ -91,6 +91,18 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_28_000010) do
     t.index ["supabase_uid"], name: "index_kidsmin_families_on_supabase_uid", unique: true
   end
 
+  create_table "kidsmin_guardians", force: :cascade do |t|
+    t.bigint "family_id", null: false
+    t.string "first_name", null: false
+    t.string "last_name"
+    t.string "phone"
+    t.string "email"
+    t.string "relationship"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["family_id"], name: "index_kidsmin_guardians_on_family_id"
+  end
+
   create_table "kidsmin_invitations", force: :cascade do |t|
     t.bigint "family_id", null: false
     t.string "token", null: false
@@ -129,6 +141,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_28_000010) do
   end
 
   add_foreign_key "kidsmin_children", "kidsmin_families", column: "family_id"
+  add_foreign_key "kidsmin_guardians", "kidsmin_families", column: "family_id"
   add_foreign_key "kidsmin_invitations", "kidsmin_families", column: "family_id"
   add_foreign_key "kidsmin_registrations", "kidsmin_children", column: "child_id"
   add_foreign_key "kidsmin_registrations", "kidsmin_events", column: "event_id"

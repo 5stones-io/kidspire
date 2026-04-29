@@ -12,6 +12,7 @@ module Kidsmin
             family.save!
 
             build_children(family)
+            build_guardians(family)
 
             invitation = Invitation.create!(family: family)
             sms_sent   = maybe_send_sms(family, invitation)
@@ -33,7 +34,7 @@ module Kidsmin
             p = family_params
             Family.new(
               supabase_uid:               "pending_#{SecureRandom.hex(8)}",
-              family_name:                "#{p[:primary_contact_last_name]} Family".strip.presence || "New Family",
+              family_name:                "#{p[:primary_contact_last_name]} Family",
               primary_contact_first_name: p[:primary_contact_first_name],
               primary_contact_last_name:  p[:primary_contact_last_name],
               phone:                      p[:phone],
@@ -53,6 +54,22 @@ module Kidsmin
                 last_name:  child_params[:last_name].presence || family.primary_contact_last_name,
                 birthdate:  age_to_birthdate(child_params[:age]),
                 notes:      child_params[:notes].presence
+              )
+            end
+          end
+
+          def build_guardians(family)
+            return unless params[:guardians].present?
+
+            params[:guardians].each do |g|
+              next if g[:first_name].blank?
+
+              family.guardians.create!(
+                first_name:   g[:first_name],
+                last_name:    g[:last_name].presence,
+                phone:        g[:phone].presence,
+                email:        g[:email].presence,
+                relationship: g[:relationship].presence
               )
             end
           end

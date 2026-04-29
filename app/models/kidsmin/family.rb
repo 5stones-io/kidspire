@@ -2,6 +2,7 @@ module Kidsmin
   class Family < ApplicationRecord
     has_many :children,      dependent: :destroy
     has_many :registrations, dependent: :destroy
+    has_many :guardians,     dependent: :destroy
 
     validates :supabase_uid, presence: true, uniqueness: true
     validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true

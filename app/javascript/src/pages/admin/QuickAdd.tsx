@@ -97,8 +97,18 @@ function ChildEntry({ row, onChange, onRemove, showRemove }: {
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 
+interface GuardianRow {
+  id:           number
+  first_name:   string
+  last_name:    string
+  phone:        string
+  email:        string
+  relationship: string
+}
+
 let nextId = 1
-const blankChild = (): ChildRow => ({ id: nextId++, first_name: "", last_name: "", age: "", notes: "" })
+const blankChild    = (): ChildRow    => ({ id: nextId++, first_name: "", last_name: "", age: "", notes: "" })
+const blankGuardian = (): GuardianRow => ({ id: nextId++, first_name: "", last_name: "", phone: "", email: "", relationship: "" })
 
 export default function QuickAdd() {
   const [parent, setParent] = useState({
@@ -108,7 +118,8 @@ export default function QuickAdd() {
     email: "",
     address: "",
   })
-  const [childRows, setChildRows] = useState<ChildRow[]>([blankChild()])
+  const [childRows, setChildRows]       = useState<ChildRow[]>([blankChild()])
+  const [guardianRows, setGuardianRows] = useState<GuardianRow[]>([])
   const [submitting, setSubmitting] = useState(false)
   const [error, setError]           = useState<string | null>(null)
   const [result, setResult]         = useState<Result | null>(null)
@@ -131,6 +142,18 @@ export default function QuickAdd() {
     setChildRows(rows => rows.filter(r => r.id !== id))
   }
 
+  function updateGuardian(id: number, field: keyof GuardianRow, val: string) {
+    setGuardianRows(rows => rows.map(r => r.id === id ? { ...r, [field]: val } : r))
+  }
+
+  function addGuardian() {
+    setGuardianRows(rows => [...rows, blankGuardian()])
+  }
+
+  function removeGuardian(id: number) {
+    setGuardianRows(rows => rows.filter(r => r.id !== id))
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setSubmitting(true)
@@ -143,9 +166,18 @@ export default function QuickAdd() {
           first_name, last_name, age: age || undefined, notes: notes || undefined,
         }))
 
+      const validGuardians = guardianRows
+        .filter(r => r.first_name.trim())
+        .map(({ first_name, last_name, phone, email, relationship }) => ({
+          first_name, last_name: last_name || undefined,
+          phone: phone || undefined, email: email || undefined,
+          relationship: relationship || undefined,
+        }))
+
       const data = await api.post<Result>("/admin/families", {
-        family:   parent,
-        children: validChildren,
+        family:    parent,
+        children:  validChildren,
+        guardians: validGuardians,
       })
 
       setResult(data)
@@ -166,6 +198,7 @@ export default function QuickAdd() {
   function reset() {
     setParent({ primary_contact_first_name: "", primary_contact_last_name: "", phone: "", email: "", address: "" })
     setChildRows([blankChild()])
+    setGuardianRows([])
     setResult(null)
     setError(null)
   }
@@ -256,11 +289,14 @@ export default function QuickAdd() {
               />
             </div>
             <div>
-              <label className="text-sm font-semibold text-muted-foreground">Last name</label>
+              <label className="text-sm font-semibold">
+                Last name <span className="text-destructive">*</span>
+              </label>
               <input
+                required
                 value={parent.primary_contact_last_name}
                 onChange={setP("primary_contact_last_name")}
-                placeholder="Anderson (optional)"
+                placeholder="Anderson"
                 className="mt-1.5 h-11 w-full rounded-xl border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
@@ -297,6 +333,79 @@ export default function QuickAdd() {
               />
             </div>
           </div>
+        </div>
+
+        {/* Additional guardians */}
+        <div className="rounded-3xl bg-card p-7 shadow-playful">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h2 className="font-display text-xl font-bold">Additional parents / guardians</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">Other adults who can pick up or are emergency contacts</p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {guardianRows.map(row => (
+              <div key={row.id} className="rounded-2xl border border-border p-4">
+                <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
+                  <div>
+                    <label className="text-sm font-semibold">First name <span className="text-destructive">*</span></label>
+                    <input required value={row.first_name}
+                      onChange={e => updateGuardian(row.id, "first_name", e.target.value)}
+                      placeholder="David"
+                      className="mt-1.5 h-11 w-full rounded-xl border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-muted-foreground">Last name</label>
+                    <input value={row.last_name}
+                      onChange={e => updateGuardian(row.id, "last_name", e.target.value)}
+                      placeholder="Anderson"
+                      className="mt-1.5 h-11 w-full rounded-xl border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-muted-foreground">Relationship</label>
+                    <select value={row.relationship}
+                      onChange={e => updateGuardian(row.id, "relationship", e.target.value)}
+                      className="mt-1.5 h-11 w-full rounded-xl border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring">
+                      <option value="">— Select —</option>
+                      {["Mother","Father","Stepmother","Stepfather","Grandparent","Guardian","Other"].map(r => (
+                        <option key={r} value={r}>{r}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-muted-foreground">Mobile</label>
+                    <input type="tel" value={row.phone}
+                      onChange={e => updateGuardian(row.id, "phone", e.target.value)}
+                      placeholder="(408) 555-0100"
+                      className="mt-1.5 h-11 w-full rounded-xl border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-muted-foreground">Email</label>
+                    <input type="email" value={row.email}
+                      onChange={e => updateGuardian(row.id, "email", e.target.value)}
+                      placeholder="david@email.com"
+                      className="mt-1.5 h-11 w-full rounded-xl border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                  </div>
+                </div>
+                <div className="mt-3 flex justify-end">
+                  <button type="button" onClick={() => removeGuardian(row.id)}
+                    className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm font-semibold text-destructive hover:bg-destructive/10 transition">
+                    🗑 Remove
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            {guardianRows.length === 0 && (
+              <p className="text-sm text-muted-foreground">No additional guardians yet.</p>
+            )}
+          </div>
+
+          <button type="button" onClick={addGuardian}
+            className="mt-4 inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold hover:bg-secondary transition">
+            + Add parent / guardian
+          </button>
         </div>
 
         {/* Children */}
