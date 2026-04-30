@@ -60,7 +60,7 @@ module Kidsmin
     end
 
     def ministry_tag
-      Kidsmin.configuration.pco_kids_ministry_tag
+      SyncSetting.current.effective_ministry_tag
     end
 
     def tag_id(client)

@@ -1,6 +1,7 @@
 module Kidsmin
   module Auth
     class PcoController < ActionController::Base
+
       PCO_AUTH_URL  = "https://api.planningcenteronline.com/oauth/authorize"
       PCO_TOKEN_URL = "https://api.planningcenteronline.com/oauth/token"
 
@@ -49,21 +50,12 @@ module Kidsmin
       private
 
       def require_admin!
-        payload = JWT.decode(
-          bearer_token,
-          Kidsmin.configuration.supabase_jwt_secret,
-          true,
-          { algorithm: "HS256" }
-        ).first
-
-        role = payload.dig("app_metadata", "role")
-        render plain: "Forbidden", status: :forbidden and return unless role == "admin"
-      rescue JWT::DecodeError, JWT::ExpiredSignature
-        render plain: "Unauthorized", status: :unauthorized
+        unless rodauth.authenticated? && rodauth.rails_account&.admin?
+          render plain: "Forbidden", status: :forbidden
+        end
       end
 
       def bearer_token
-        # PCO sends state back in the callback; we embed the token there
         params[:token] || params[:state] || request.headers["Authorization"]&.split(" ")&.last
       end
 

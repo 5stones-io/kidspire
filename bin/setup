@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -e
+
+echo ""
+echo "=== kidsmin local setup ==="
+echo ""
+
+# Ruby dependencies
+echo "▶ Installing Ruby gems..."
+bundle install
+
+# Node dependencies
+echo "▶ Installing JS packages..."
+bun install
+
+# Environment file
+if [ ! -f .env ]; then
+  cp .env.example .env
+  echo "✅ Created .env from .env.example"
+  echo "   → Open .env and fill in your Supabase + database credentials"
+  echo ""
+else
+  echo "✅ .env already exists"
+fi
+
+# Generate encryption key if missing
+if grep -q "^ENCRYPTION_KEY=$" .env; then
+  KEY=$(openssl rand -hex 32)
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -i '' "s/^ENCRYPTION_KEY=$/ENCRYPTION_KEY=$KEY/" .env
+  else
+    sed -i "s/^ENCRYPTION_KEY=$/ENCRYPTION_KEY=$KEY/" .env
+  fi
+  echo "✅ Generated ENCRYPTION_KEY"
+fi
+
+echo ""
+echo "=== Next steps ==="
+echo ""
+echo "  1. Fill in .env with your Supabase and Twilio credentials"
+echo "  2. bundle exec rails db:create db:migrate db:seed"
+echo "  3. Terminal 1: bundle exec puma -t 5 -p 3000"
+echo "  4. Terminal 2: bun run dev"
+echo "  5. Open: http://localhost:3036"
+echo ""
+echo "  To set your account as admin:"
+echo "  bundle exec rails kidsmin:make_admin[your@email.com]"
+echo ""

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
-import { useParams, useNavigate } from "react-router-dom"
-import { supabase } from "@/lib/supabase"
+import { useParams } from "react-router-dom"
+import { auth } from "@/lib/auth"
 import { api } from "@/lib/api"
 import { Button } from "@/components/ui/Button"
 
@@ -15,11 +15,10 @@ interface InvitePreview {
   }
 }
 
-type Phase = "loading" | "invalid" | "ready" | "sent" | "linking" | "done" | "error"
+type Phase = "loading" | "invalid" | "ready" | "sent" | "error"
 
 export default function AcceptInvite() {
-  const { token }   = useParams<{ token: string }>()
-  const navigate    = useNavigate()
+  const { token } = useParams<{ token: string }>()
   const [phase, setPhase]     = useState<Phase>("loading")
   const [preview, setPreview] = useState<InvitePreview | null>(null)
   const [email, setEmail]     = useState("")
@@ -36,37 +35,20 @@ export default function AcceptInvite() {
       .catch(() => setPhase("invalid"))
   }, [token])
 
-  // After Supabase auth completes, link the account to the invited family
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === "SIGNED_IN" && session && phase === "sent") {
-        setPhase("linking")
-        try {
-          await api.post(`/invitations/${token}/accept`, {})
-          setPhase("done")
-          setTimeout(() => navigate("/portal/dashboard"), 1500)
-        } catch {
-          setError("Account created but couldn't link your invite. Please contact support.")
-          setPhase("error")
-        }
-      }
-    })
-    return () => subscription.unsubscribe()
-  }, [phase, token, navigate])
-
   async function sendMagicLink(e: React.FormEvent) {
     e.preventDefault()
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: `${window.location.origin}/invite/${token}` },
-    })
-    if (error) setError(error.message)
-    else setPhase("sent")
+    // Store invite token so AuthCallback can link the account after sign-in
+    sessionStorage.setItem("kidsmin_invite_token", token!)
+    try {
+      await auth.requestMagicLink(email)
+      setPhase("sent")
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to send magic link")
+      setPhase("error")
+    }
   }
 
-  if (phase === "loading") {
-    return <Screen emoji="⏳" title="Checking your invite…" />
-  }
+  if (phase === "loading") return <Screen emoji="⏳" title="Checking your invite…" />
 
   if (phase === "invalid") {
     return (
@@ -87,19 +69,14 @@ export default function AcceptInvite() {
     )
   }
 
-  if (phase === "linking") {
-    return <Screen emoji="🔗" title="Linking your account…" />
-  }
-
-  if (phase === "done") {
-    return <Screen emoji="🎉" title="You're all set! Taking you to your dashboard…" />
-  }
-
   if (phase === "error") {
-    return <Screen emoji="⚠️" title="Something went wrong"><p className="mt-2 text-sm text-destructive">{error}</p></Screen>
+    return (
+      <Screen emoji="⚠️" title="Something went wrong">
+        <p className="mt-2 text-sm text-destructive">{error}</p>
+      </Screen>
+    )
   }
 
-  // phase === "ready"
   const name = [preview?.family.first_name, preview?.family.last_name].filter(Boolean).join(" ")
 
   return (
@@ -125,7 +102,6 @@ export default function AcceptInvite() {
             placeholder="parent@email.com"
             className="h-12 rounded-2xl border border-border bg-background px-4 focus:outline-none focus:ring-2 focus:ring-ring"
           />
-          {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" variant="primary" size="lg" className="w-full justify-center">
             Send magic link
           </Button>

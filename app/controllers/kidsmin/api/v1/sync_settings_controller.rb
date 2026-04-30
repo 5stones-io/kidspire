@@ -10,7 +10,13 @@ module Kidsmin
 
         def update
           settings = SyncSetting.current
+          was_auto  = settings.auto_sync_enabled?
+
           if settings.update(sync_setting_params)
+            # If auto-sync was just enabled, kick off the scheduled chain
+            if settings.auto_sync_enabled? && !was_auto
+              Kidsmin::PcoScheduledSyncJob.kick_off_if_enabled!
+            end
             render json: SyncSettingBlueprint.render(settings)
           else
             render json: { error: settings.errors.full_messages.first, code: "validation_error" },
@@ -27,7 +33,9 @@ module Kidsmin
             :inbound_events_sync,
             :outbound_registrations_sync,
             :sync_frequency_hours,
-            :conflict_resolution
+            :conflict_resolution,
+            :auto_sync_enabled,
+            :pco_kids_ministry_tag
           )
         end
       end

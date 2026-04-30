@@ -4,13 +4,15 @@ ruby "~> 3.3"
 
 gemspec
 
-gem "puma",        ">= 5.0"
+gem "puma",          ">= 5.0"
+gem "rodauth-rails", "~> 1.0"
+gem "jwt"
 gem "kaminari"
 gem "blueprinter"
-gem "jwt"
 gem "httparty"
-gem "sidekiq",     "~> 7.0", require: false
-gem "redis",       "~> 5.0", require: false
+gem "sidekiq",        "~> 7.0", require: false
+gem "connection_pool", "~> 2.0"               # 3.x breaks Ruby 3.3
+gem "redis",          "~> 5.0", require: false
 gem "rack-cors"
 gem "rack-attack"
 

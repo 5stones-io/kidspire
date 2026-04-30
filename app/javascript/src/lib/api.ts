@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase"
+import { auth } from "@/lib/auth"
 
 const apiBase = (): string =>
   window.__KIDSMIN_CONFIG__?.apiBaseUrl ?? import.meta.env.VITE_API_BASE_URL ?? "/api/v1"
@@ -15,8 +15,7 @@ class KidsminApiError extends Error {
 }
 
 async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const { data: { session } } = await supabase.auth.getSession()
-  const token = session?.access_token
+  const token = auth.getToken()
 
   const response = await fetch(`${apiBase()}${path}`, {
     ...init,
@@ -39,10 +38,10 @@ async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
 }
 
 export const api = {
-  get:    <T>(path: string)                       => apiFetch<T>(path),
-  post:   <T>(path: string, data: unknown)        => apiFetch<T>(path, { method: "POST",   body: JSON.stringify(data) }),
-  patch:  <T>(path: string, data: unknown)        => apiFetch<T>(path, { method: "PATCH",  body: JSON.stringify(data) }),
-  delete: <T>(path: string)                       => apiFetch<T>(path, { method: "DELETE" }),
+  get:    <T>(path: string)                => apiFetch<T>(path),
+  post:   <T>(path: string, data: unknown) => apiFetch<T>(path, { method: "POST",   body: JSON.stringify(data) }),
+  patch:  <T>(path: string, data: unknown) => apiFetch<T>(path, { method: "PATCH",  body: JSON.stringify(data) }),
+  delete: <T>(path: string)               => apiFetch<T>(path, { method: "DELETE" }),
 }
 
 export { KidsminApiError }

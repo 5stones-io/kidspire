@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
-  scope module: "kidsmin" do
-    get "/up", to: "rails/health#show"
+  get "/up", to: "rails/health#show"
 
+  scope module: "kidsmin" do
     namespace :api do
       namespace :v1 do
         resource  :family,        only: [:show, :update]
@@ -12,7 +12,13 @@ Rails.application.routes.draw do
         post "/sync/trigger", to: "sync#trigger"
 
         namespace :admin do
-          resources :families, only: [:create]
+          resource  :stats,      only: [:show]
+          resource  :config,     only: [:show]
+          resource  :pco_status, only: [:show]
+          resources :registrations, only: [:index]
+          resources :families,   only: [:index, :show, :create] do
+            post :invite, on: :member
+          end
         end
 
         resources :invitations, only: [:show], param: :token do
@@ -24,7 +30,6 @@ Rails.application.routes.draw do
     namespace :auth do
       get "pco/connect",  to: "pco#connect"
       get "pco/callback", to: "pco#callback"
-      get "callback",     to: "supabase#callback"
     end
 
     get "/", to: "application#frontend"

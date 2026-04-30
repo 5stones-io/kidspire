@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
   spec.authors     = ["Chad Singleton"]
   spec.email       = ["chad@jubileechurch.com"]
   spec.summary     = "Self-hostable children's ministry portal — family profiles, event registration, and PCO sync"
-  spec.description = "Open source children's ministry platform. Mountable Rails Engine with React/Vite frontend, Supabase Auth, and bidirectional Planning Center Online sync."
+  spec.description = "Open source children's ministry platform. Mountable Rails Engine with React/Vite frontend, Rodauth-powered passwordless auth, and bidirectional Planning Center Online sync."
   spec.homepage    = "https://github.com/chadjsdev/kidsmin"
   spec.license     = "MIT"
 
@@ -23,10 +23,11 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   spec.required_ruby_version = ">= 3.3"
 
-  spec.add_dependency "rails",      "~> 7.2"
-  spec.add_dependency "pg",         "~> 1.5"
+  spec.add_dependency "rails",         "~> 7.2"
+  spec.add_dependency "pg",           "~> 1.5"
+  spec.add_dependency "rodauth-rails", "~> 1.0"
   spec.add_dependency "jwt"
-  spec.add_dependency "bcrypt",     "~> 3.1"
+  spec.add_dependency "bcrypt",        "~> 3.1"
   spec.add_dependency "blueprinter"
   spec.add_dependency "sidekiq",     "~> 7.0"
   spec.add_dependency "redis",      "~> 5.0"

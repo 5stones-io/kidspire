@@ -1,10 +1,9 @@
 Rails.application.configure do
+  # No CSP in development — Vite HMR requires eval and inline scripts.
+  # Production CSP is handled at the infrastructure level (Railway / CDN headers).
+  next if Rails.env.development?
+
   config.content_security_policy do |policy|
-    if Rails.env.development?
-      policy.script_src  :self, :unsafe_eval, :unsafe_inline, "http://localhost:3036"
-      policy.connect_src :self, "http://localhost:3036", "ws://localhost:3036", "http://localhost:3000"
-    else
-      policy.script_src :self
-    end
+    policy.script_src :self
   end
 end

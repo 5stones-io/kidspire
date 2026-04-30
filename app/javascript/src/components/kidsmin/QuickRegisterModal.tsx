@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
-import { supabase } from "@/lib/supabase"
+import { auth } from "@/lib/auth"
 import { useFamily }   from "@/hooks/useFamily"
 import { useChildren } from "@/hooks/useChildren"
 import { api, KidsminApiError } from "@/lib/api"
@@ -29,7 +29,7 @@ function isEligible(event: Event, child: Child) {
 
 export function QuickRegisterModal({ event, onClose, onSuccess }: Props) {
   const navigate = useNavigate()
-  const [authed, setAuthed]   = useState<boolean | null>(null)
+  const authed = useMemo(() => auth.isAuthenticated(), [])
   const { family }   = useFamily()
   const { children } = useChildren()
 
@@ -39,10 +39,6 @@ export function QuickRegisterModal({ event, onClose, onSuccess }: Props) {
   const [error, setError]           = useState<string | null>(null)
   const [done, setDone]             = useState(false)
   const [registered, setRegistered] = useState<Registration[]>([])
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setAuthed(!!data.session))
-  }, [])
 
   useEffect(() => {
     if (children.length > 0) {

@@ -10,8 +10,8 @@ module Kidsmin
       active.find_by(token: token)
     end
 
-    def accept!(supabase_uid)
-      family.update!(supabase_uid: supabase_uid)
+    def accept!(account_id)
+      family.update!(account_id: account_id)
       update!(accepted_at: Time.current)
     end
 

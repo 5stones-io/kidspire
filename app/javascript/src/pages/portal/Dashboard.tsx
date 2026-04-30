@@ -1,28 +1,17 @@
-import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import type { Session } from "@supabase/supabase-js"
-import { useFamily }   from "@/hooks/useFamily"
-import { useChildren } from "@/hooks/useChildren"
-import { useEvents }   from "@/hooks/useEvents"
-import { ChildCard }   from "@/components/kidsmin/ChildCard"
-import { EventCard }   from "@/components/kidsmin/EventCard"
+import { auth }          from "@/lib/auth"
+import { useFamily }     from "@/hooks/useFamily"
+import { useChildren }   from "@/hooks/useChildren"
+import { useEvents }     from "@/hooks/useEvents"
+import { ChildCard }     from "@/components/kidsmin/ChildCard"
+import { EventCard }     from "@/components/kidsmin/EventCard"
 import { Button, ButtonLink } from "@/components/ui/Button"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card"
-import { supabase }    from "@/lib/supabase"
-
-function useIsAdmin() {
-  const [admin, setAdmin] = useState(false)
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setAdmin(data.session?.user?.app_metadata?.role === "admin")
-    })
-  }, [])
-  return admin
-}
+import { Card, CardContent } from "@/components/ui/Card"
 
 export default function Dashboard() {
   const navigate = useNavigate()
-  const isAdmin  = useIsAdmin()
+  const user     = auth.getUser()
+  const isAdmin  = user?.admin ?? false
   const { family, loading: familyLoading }     = useFamily()
   const { children, loading: childrenLoading } = useChildren()
   const { events, loading: eventsLoading }     = useEvents()
@@ -37,11 +26,14 @@ export default function Dashboard() {
           <Link to="/" className="font-display text-xl font-bold text-primary">kidsmin</Link>
           <nav className="flex items-center gap-2">
             {isAdmin && (
-              <ButtonLink to="/admin/quick-add" variant="accent" size="sm">+ Add family</ButtonLink>
+              <>
+                <ButtonLink to="/admin" variant="ghost" size="sm">Admin</ButtonLink>
+                <ButtonLink to="/admin/quick-add" variant="accent" size="sm">+ Add family</ButtonLink>
+              </>
             )}
             <ButtonLink to="/portal/profile" variant="ghost" size="sm">Settings</ButtonLink>
             <ButtonLink to="/events"         variant="ghost" size="sm">Events</ButtonLink>
-            <Button variant="outline" size="sm" onClick={async () => { await supabase.auth.signOut(); navigate("/") }}>
+            <Button variant="outline" size="sm" onClick={() => { auth.signOut(); navigate("/") }}>
               Sign out
             </Button>
           </nav>

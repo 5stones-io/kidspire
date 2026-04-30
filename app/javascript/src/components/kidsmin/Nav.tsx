@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react"
-import { Link, useLocation } from "react-router-dom"
-import type { Session } from "@supabase/supabase-js"
-import { supabase } from "@/lib/supabase"
+import { useState } from "react"
+import { Link, useLocation, useNavigate } from "react-router-dom"
+import { auth } from "@/lib/auth"
 import { Button, ButtonLink } from "@/components/ui/Button"
 
 const navLinks = [
@@ -11,18 +10,18 @@ const navLinks = [
 ]
 
 export function Nav() {
-  const [session, setSession] = useState<Session | null | undefined>(undefined)
   const [open, setOpen] = useState(false)
   const location = useLocation()
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSession(data.session))
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, s) => setSession(s))
-    return () => subscription.unsubscribe()
-  }, [])
+  const navigate = useNavigate()
+  const isAuthed = auth.isAuthenticated()
 
   const isActive = (href: string) =>
     href === "/" ? location.pathname === "/" : location.pathname.startsWith(href)
+
+  function handleSignOut() {
+    auth.signOut()
+    navigate("/")
+  }
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
@@ -48,17 +47,17 @@ export function Nav() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-          {session ? (
+          {isAuthed ? (
             <>
               <ButtonLink to="/portal/dashboard" variant="ghost" size="sm">Dashboard</ButtonLink>
-              <Button variant="outline" size="sm" onClick={() => supabase.auth.signOut()}>Sign out</Button>
+              <Button variant="outline" size="sm" onClick={handleSignOut}>Sign out</Button>
             </>
-          ) : session === null ? (
+          ) : (
             <>
               <ButtonLink to="/login" variant="ghost" size="sm">Sign in</ButtonLink>
               <ButtonLink to="/login" variant="accent" size="sm">Create account</ButtonLink>
             </>
-          ) : null}
+          )}
         </div>
 
         <button
@@ -81,9 +80,9 @@ export function Nav() {
                 {label}
               </Link>
             ))}
-            <ButtonLink to={session ? "/portal/dashboard" : "/login"} variant="accent" size="md"
+            <ButtonLink to={isAuthed ? "/portal/dashboard" : "/login"} variant="accent" size="md"
               className="mt-2 w-full justify-center" onClick={() => setOpen(false)}>
-              {session ? "Dashboard" : "Sign in / Create account"}
+              {isAuthed ? "Dashboard" : "Sign in / Create account"}
             </ButtonLink>
           </nav>
         </div>

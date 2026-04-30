@@ -1,16 +1,14 @@
 module Kidsmin
   class Family < ApplicationRecord
+    belongs_to :account, optional: true
     has_many :children,      dependent: :destroy
     has_many :registrations, dependent: :destroy
     has_many :guardians,     dependent: :destroy
 
-    validates :supabase_uid, presence: true, uniqueness: true
     validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
 
     after_commit :enqueue_outbound_profile_sync, on: :update, if: :profile_changed?
 
-    # Virtual accessor — combines first+last for convenience; splitting is lossy
-    # but acceptable for display. PCO sync uses the separate columns directly.
     def primary_contact_name
       "#{primary_contact_first_name} #{primary_contact_last_name}".strip
     end

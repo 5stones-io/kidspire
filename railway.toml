@@ -1,7 +1,10 @@
 [build]
 builder = "nixpacks"
-buildCommand = "bundle install && npm install && npm run build && bundle exec rails assets:precompile 2>/dev/null || true"
+buildCommand = "bundle install && bun install && bun run build && bundle exec rails db:migrate"
 
 [deploy]
-restartPolicyType = "on_failure"
+startCommand        = "bundle exec puma -C config/puma.rb"
+healthcheckPath     = "/up"
+healthcheckTimeout  = 60
+restartPolicyType   = "on_failure"
 restartPolicyMaxRetries = 3

@@ -10,22 +10,36 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_04_28_000011) do
-  create_schema "auth"
-  create_schema "extensions"
-  create_schema "graphql"
-  create_schema "graphql_public"
-  create_schema "pgbouncer"
-  create_schema "realtime"
-  create_schema "storage"
-  create_schema "vault"
-
+ActiveRecord::Schema[7.2].define(version: 2026_04_28_000013) do
   # These are extensions that must be enabled in order to support this database
-  enable_extension "pg_stat_statements"
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
-  enable_extension "supabase_vault"
-  enable_extension "uuid-ossp"
+
+  create_table "account_email_auth_keys", force: :cascade do |t|
+    t.string "key", null: false
+    t.datetime "deadline", null: false
+    t.datetime "email_last_sent", default: -> { "CURRENT_TIMESTAMP" }, null: false
+  end
+
+  create_table "account_lockouts", force: :cascade do |t|
+    t.string "key", null: false
+    t.datetime "deadline", null: false
+    t.datetime "email_last_sent"
+  end
+
+  create_table "account_login_failures", force: :cascade do |t|
+    t.integer "number", default: 1, null: false
+  end
+
+  create_table "accounts", force: :cascade do |t|
+    t.string "email", null: false
+    t.string "phone"
+    t.boolean "admin", default: false, null: false
+    t.integer "status_id", default: 2, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_accounts_on_email", unique: true, where: "(status_id <> 3)"
+  end
 
   create_table "kidsmin_children", force: :cascade do |t|
     t.bigint "family_id", null: false
@@ -72,7 +86,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_28_000011) do
   end
 
   create_table "kidsmin_families", force: :cascade do |t|
-    t.string "supabase_uid", null: false
     t.string "family_name"
     t.string "email"
     t.string "phone"
@@ -85,10 +98,11 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_28_000011) do
     t.string "primary_contact_first_name"
     t.string "primary_contact_last_name"
     t.string "address"
+    t.bigint "account_id"
+    t.index ["account_id"], name: "index_kidsmin_families_on_account_id", unique: true, where: "(account_id IS NOT NULL)"
     t.index ["email"], name: "index_kidsmin_families_on_email"
     t.index ["pco_household_id"], name: "index_kidsmin_families_on_pco_household_id"
     t.index ["pco_person_id"], name: "index_kidsmin_families_on_pco_person_id"
-    t.index ["supabase_uid"], name: "index_kidsmin_families_on_supabase_uid", unique: true
   end
 
   create_table "kidsmin_guardians", force: :cascade do |t|
@@ -140,7 +154,11 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_28_000011) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "account_email_auth_keys", "accounts", column: "id"
+  add_foreign_key "account_lockouts", "accounts", column: "id"
+  add_foreign_key "account_login_failures", "accounts", column: "id"
   add_foreign_key "kidsmin_children", "kidsmin_families", column: "family_id"
+  add_foreign_key "kidsmin_families", "accounts", on_delete: :nullify
   add_foreign_key "kidsmin_guardians", "kidsmin_families", column: "family_id"
   add_foreign_key "kidsmin_invitations", "kidsmin_families", column: "family_id"
   add_foreign_key "kidsmin_registrations", "kidsmin_children", column: "child_id"

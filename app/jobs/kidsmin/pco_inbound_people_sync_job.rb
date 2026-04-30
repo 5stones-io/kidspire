@@ -3,14 +3,34 @@ module Kidsmin
     def perform
       return unless SyncSetting.current.inbound_people_sync?
 
-      client   = PcoClient.new
+      client = PcoClient.new
+
+      # If a ministry tag is configured, limit the sync to households that
+      # contain at least one person bearing that tag (the primary contact).
+      tagged_hh_ids = tagged_household_ids(client) if ministry_tag.present?
+
+      if tagged_hh_ids&.empty?
+        Rails.logger.warn("[Kidsmin] PcoInboundPeopleSyncJob: tag '#{ministry_tag}' matched no people — sync aborted")
+        return
+      end
+
       response = client.paginate(
         "/people/v2/people",
         include: "households,emails,phone_numbers,addresses"
       )
 
-      people     = response["data"]
-      included   = response["included"]
+      people    = response["data"]
+      included  = response["included"]
+
+      # Restrict to tagged households when the tag is configured
+      if tagged_hh_ids
+        people = people.select { |p|
+          hh_id = p.dig("relationships", "households", "data", 0, "id")
+          tagged_hh_ids.include?(hh_id)
+        }
+        Rails.logger.info("[Kidsmin] Tag filter active — #{people.size} people in #{tagged_hh_ids.size} tagged households")
+      end
+
       households = index_by_id(included, "Household")
       emails     = group_by_person(included, "Email")
       phones     = group_by_person(included, "PhoneNumber")
@@ -19,7 +39,6 @@ module Kidsmin
       adults   = people.reject { |p| p.dig("attributes", "child") }
       children = people.select { |p| p.dig("attributes", "child") }
 
-      # Adults first so Family records exist before children are linked
       adults.each   { |p| sync_family(p, households, emails, phones, addresses) }
       children.each { |p| sync_child(p, households) }
 
@@ -32,6 +51,32 @@ module Kidsmin
 
     private
 
+    # Returns a Set of PCO household IDs that contain at least one person
+    # tagged with the ministry tag, or nil if no tag is configured.
+    def tagged_household_ids(client)
+      # Find the tag by name
+      all_tags = client.get_all("/people/v2/tags", "where[name]" => ministry_tag)
+      tag = all_tags.find { |t| t.dig("attributes", "name") == ministry_tag }
+
+      unless tag
+        Rails.logger.warn("[Kidsmin] PCO tag '#{ministry_tag}' not found — check PCO_KIDS_MINISTRY_TAG")
+        return Set.new
+      end
+
+      # Fetch every person bearing that tag and collect their household IDs
+      tagged_people = client.get_all("/people/v2/tags/#{tag["id"]}/people")
+      ids = tagged_people.flat_map { |p|
+        p.dig("relationships", "households", "data")&.map { |h| h["id"] } || []
+      }.to_set
+
+      Rails.logger.info("[Kidsmin] PCO tag '#{ministry_tag}' (id=#{tag["id"]}) → #{ids.size} households")
+      ids
+    end
+
+    def ministry_tag
+      SyncSetting.current.effective_ministry_tag
+    end
+
     def sync_family(person, households, emails, phones, addresses)
       pco_id       = person["id"]
       attrs        = person["attributes"]
@@ -43,7 +88,7 @@ module Kidsmin
 
       family = Family.find_by(pco_person_id: pco_id) ||
                (email.present? && Family.find_by(email: email)) ||
-               Family.new(supabase_uid: "pco_#{pco_id}")
+               Family.new
 
       pco_attrs = {
         pco_person_id:      pco_id,
@@ -73,7 +118,6 @@ module Kidsmin
           family.assign_attributes(pco_attrs)
         end
       else
-        # kidsmin_wins — only update PCO linkage, not profile fields
         family.assign_attributes(pco_attrs)
       end
 
@@ -101,8 +145,8 @@ module Kidsmin
         first_name:         attrs["first_name"] || "Unknown",
         last_name:          attrs["last_name"]  || "Unknown",
         birthdate:          attrs["birthdate"],
-        grade:              attrs["grade"],           # PCO sends integer — model accepts it directly
-        notes:              attrs["medical_notes"],   # PCO field name
+        grade:              attrs["grade"],
+        notes:              attrs["medical_notes"],
         pco_person_id:      pco_id,
         pco_last_synced_at: Time.current
       )
@@ -133,7 +177,6 @@ module Kidsmin
       records.find { |r| r.dig("attributes", "primary") } || records.first
     end
 
-    # Concatenate PCO address fields into a single string
     def format_address(record)
       return nil unless record
       a = record["attributes"] || {}

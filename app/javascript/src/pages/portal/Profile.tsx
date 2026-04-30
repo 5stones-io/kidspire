@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { useFamily }   from "@/hooks/useFamily"
 import { useChildren } from "@/hooks/useChildren"
 import { Button, ButtonLink } from "@/components/ui/Button"
-import { supabase } from "@/lib/supabase"
+import { auth } from "@/lib/auth"
 import type { Child } from "@/types"
 
 // ── Shared form primitives ───────────────────────────────────────────────────
@@ -274,7 +274,7 @@ export default function Profile() {
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3 md:px-6">
           <ButtonLink to="/portal/dashboard" variant="ghost" size="sm">← Dashboard</ButtonLink>
-          <Button variant="outline" size="sm" onClick={async () => { await supabase.auth.signOut(); navigate("/") }}>
+          <Button variant="outline" size="sm" onClick={() => { auth.signOut(); navigate("/") }}>
             Sign out
           </Button>
         </div>
@@ -349,16 +349,6 @@ export default function Profile() {
         <div className="rounded-3xl bg-card p-7 shadow-playful">
           <h2 className="font-display text-2xl font-bold">Connected accounts</h2>
           <div className="mt-5 space-y-3">
-            <div className="flex items-center justify-between rounded-2xl border border-border p-4">
-              <div className="flex items-center gap-3">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-mint-soft">🔵</span>
-                <div>
-                  <p className="font-semibold">Google / Apple</p>
-                  <p className="text-xs text-muted-foreground">{family?.email}</p>
-                </div>
-              </div>
-              <span className="inline-flex items-center gap-1 rounded-full bg-mint-soft px-3 py-1 text-xs font-bold">✓ Connected</span>
-            </div>
             <div className="flex items-center justify-between rounded-2xl border border-border p-4">
               <div className="flex items-center gap-3">
                 <span className="grid h-10 w-10 place-items-center rounded-xl bg-secondary">⛪</span>
