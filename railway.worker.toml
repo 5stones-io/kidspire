@@ -1,0 +1,8 @@
+[build]
+builder = "nixpacks"
+buildCommand = "bundle install"
+
+[deploy]
+startCommand       = "bundle exec sidekiq"
+restartPolicyType  = "on_failure"
+restartPolicyMaxRetries = 3
