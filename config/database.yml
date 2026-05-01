@@ -6,11 +6,11 @@ default: &default
 
 development:
   <<: *default
-  database: kidsmin_development
+  database: kidspire_development
 
 test:
   <<: *default
-  database: kidsmin_test
+  database: kidspire_test
 
 production:
   <<: *default

@@ -3,8 +3,8 @@ import { auth }          from "@/lib/auth"
 import { useFamily }     from "@/hooks/useFamily"
 import { useChildren }   from "@/hooks/useChildren"
 import { useEvents }     from "@/hooks/useEvents"
-import { ChildCard }     from "@/components/kidsmin/ChildCard"
-import { EventCard }     from "@/components/kidsmin/EventCard"
+import { ChildCard }     from "@/components/kidspire/ChildCard"
+import { EventCard }     from "@/components/kidspire/EventCard"
 import { Button, ButtonLink } from "@/components/ui/Button"
 import { Card, CardContent } from "@/components/ui/Card"
 
@@ -23,7 +23,7 @@ export default function Dashboard() {
       {/* Glass nav */}
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-6">
-          <Link to="/" className="font-display text-xl font-bold text-primary">kidsmin</Link>
+          <Link to="/" className="font-display text-xl font-bold text-primary">kidspire</Link>
           <nav className="flex items-center gap-2">
             {isAdmin && (
               <>

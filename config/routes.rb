@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   get "/up", to: "rails/health#show"
 
-  scope module: "kidsmin" do
+  scope module: "kidspire" do
     namespace :api do
       namespace :v1 do
         resource  :family,        only: [:show, :update]

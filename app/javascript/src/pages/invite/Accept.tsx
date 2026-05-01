@@ -38,7 +38,7 @@ export default function AcceptInvite() {
   async function sendMagicLink(e: React.FormEvent) {
     e.preventDefault()
     // Store invite token so AuthCallback can link the account after sign-in
-    sessionStorage.setItem("kidsmin_invite_token", token!)
+    sessionStorage.setItem("kidspire_invite_token", token!)
     try {
       await auth.requestMagicLink(email)
       setPhase("sent")

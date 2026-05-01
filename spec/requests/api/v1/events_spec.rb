@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe "GET /api/v1/events", type: :request do
   it "returns 200 without authentication" do
-    create_list(:kidsmin_event, 2)
+    create_list(:kidspire_event, 2)
     get "/api/v1/events"
     expect(response).to have_http_status(:ok)
     body = JSON.parse(response.body)
@@ -11,8 +11,8 @@ RSpec.describe "GET /api/v1/events", type: :request do
   end
 
   it "excludes past events" do
-    future = create(:kidsmin_event)
-    _past  = create(:kidsmin_event, :past)
+    future = create(:kidspire_event)
+    _past  = create(:kidspire_event, :past)
     get "/api/v1/events"
     ids = JSON.parse(response.body)["events"].map { |e| e["id"] }
     expect(ids).to include(future.id)

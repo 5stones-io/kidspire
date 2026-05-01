@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { api, KidsminApiError } from "@/lib/api"
+import { api, KidspireApiError } from "@/lib/api"
 import type { Event, EventsPage, Registration } from "@/types"
 
 export function useEvents(page = 1) {
@@ -11,7 +11,7 @@ export function useEvents(page = 1) {
     setLoading(true)
     api.get<EventsPage>(`/events?page=${page}`)
       .then(setData)
-      .catch((e: KidsminApiError) => setError(e.message))
+      .catch((e: KidspireApiError) => setError(e.message))
       .finally(() => setLoading(false))
   }, [page])
 
@@ -26,7 +26,7 @@ export function useEvent(id: number) {
   useEffect(() => {
     api.get<Event>(`/events/${id}`)
       .then(setEvent)
-      .catch((e: KidsminApiError) => setError(e.message))
+      .catch((e: KidspireApiError) => setError(e.message))
       .finally(() => setLoading(false))
   }, [id])
 

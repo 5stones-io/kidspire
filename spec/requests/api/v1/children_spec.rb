@@ -9,8 +9,8 @@ RSpec.describe "GET /api/v1/children", type: :request do
 
   it "returns 200 with a valid token" do
     account = create(:account)
-    family  = create(:kidsmin_family, account: account)
-    create(:kidsmin_child, family: family)
+    family  = create(:kidspire_family, account: account)
+    create(:kidspire_child, family: family)
 
     get "/api/v1/children", headers: auth_headers(account)
     expect(response).to have_http_status(:ok)

@@ -1,9 +1,9 @@
 # Sample events — mirrors the JCC Kidz design reference.
 # Run with: bundle exec rails db:seed
 
-Kidsmin::Event.destroy_all
+Kidspire::Event.destroy_all
 
-Kidsmin::Event.create!([
+Kidspire::Event.create!([
   {
     title:       "Vacation Bible School: Kingdom Quest",
     description: "A week of worship, games, crafts, and Bible adventures for the whole family! Kids explore the Kingdom of God through interactive stations, team challenges, and daily devotions.",
@@ -69,4 +69,4 @@ Kidsmin::Event.create!([
   },
 ])
 
-puts "✅ Seeded #{Kidsmin::Event.count} events"
+puts "✅ Seeded #{Kidspire::Event.count} events"

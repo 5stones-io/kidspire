@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>kidspire</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
+
+    <% if Rails.env.development? %>
+      <%# React Fast Refresh preamble — required when Vite is not serving the HTML itself %>
+      <script type="module">
+        import RefreshRuntime from 'http://localhost:3036/@react-refresh'
+        RefreshRuntime.injectIntoGlobalHook(window)
+        window.$RefreshReg$ = () => {}
+        window.$RefreshSig$ = () => (type) => type
+        window.__vite_plugin_react_preamble_installed__ = true
+      </script>
+      <script type="module" src="http://localhost:3036/@vite/client"></script>
+      <script type="module" src="http://localhost:3036/app/javascript/application.tsx"></script>
+    <% else %>
+      <% entry = Kidspire::ViteManifest.entry %>
+      <% if entry %>
+        <% (entry["css"] || []).each do |css| %>
+          <link rel="stylesheet" href="/vite/<%= css %>" />
+        <% end %>
+        <script type="module" src="/vite/<%= entry["file"] %>"></script>
+      <% end %>
+    <% end %>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      window.__KIDSPIRE_CONFIG__ = {
+        apiBaseUrl: "<%= request.base_url %>/api/v1"
+      };
+    </script>
+  </body>
+</html>

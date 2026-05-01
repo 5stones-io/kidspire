@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { api, KidsminApiError } from "@/lib/api"
+import { api, KidspireApiError } from "@/lib/api"
 import type { Child } from "@/types"
 
 export function useChildren() {
@@ -10,7 +10,7 @@ export function useChildren() {
   useEffect(() => {
     api.get<Child[]>("/children")
       .then(setChildren)
-      .catch((e: KidsminApiError) => setError(e.message))
+      .catch((e: KidspireApiError) => setError(e.message))
       .finally(() => setLoading(false))
   }, [])
 

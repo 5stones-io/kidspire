@@ -1,4 +1,4 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: ENV.fetch("MAILER_FROM", "noreply@kidsmin.app")
+  default from: ENV.fetch("MAILER_FROM", "noreply@kidspire.app")
   layout false
 end

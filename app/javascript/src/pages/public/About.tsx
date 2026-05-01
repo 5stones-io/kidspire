@@ -1,5 +1,5 @@
-import { Nav } from "@/components/kidsmin/Nav"
-import { Footer } from "@/components/kidsmin/Footer"
+import { Nav } from "@/components/kidspire/Nav"
+import { Footer } from "@/components/kidspire/Footer"
 import { ButtonLink } from "@/components/ui/Button"
 
 const team = [

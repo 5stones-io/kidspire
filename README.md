@@ -59,13 +59,24 @@ The fastest path is one-click Railway deploy:
 
 ### Local setup
 
+**Prerequisites:** PostgreSQL, Redis, Node.js, and [overmind](https://github.com/DarthSim/overmind) running locally.
+
 ```bash
 git clone https://github.com/5stones-io/kidspire
 cd kidspire
-cp .env.example .env   # fill in values
+cp .env.example .env
+```
+
+Edit `.env` and set at minimum:
+- `DATABASE_URL` — replace `your_pg_username` with your local Postgres username (`whoami` on Mac/Linux)
+- `SECRET_KEY_BASE` — generate with `openssl rand -hex 64`
+- `ENCRYPTION_KEY` — generate with `openssl rand -hex 32`
+
+```bash
 bundle install
 bun install
-bundle exec rails db:setup
+npx playwright install chromium  # for UI testing
+bundle exec rails db:create db:migrate db:seed
 overmind start -f Procfile.dev  # Rails :3000, Vite :3036, Sidekiq
 ```
 
@@ -76,27 +87,27 @@ overmind start -f Procfile.dev  # Rails :3000, Vite :3036, Sidekiq
 Add to your Gemfile:
 
 ```ruby
-gem 'kidsmin'
+gem 'kidspire'
 ```
 
 Mount in `config/routes.rb`:
 
 ```ruby
-mount Kidsmin::Engine => '/'
+mount Kidspire::Engine => '/'
 ```
 
 Run the engine migrations:
 
 ```bash
-bundle exec rails kidsmin:install:migrations
+bundle exec rails kidspire:install:migrations
 bundle exec rails db:migrate
 ```
 
 Configure in an initializer:
 
 ```ruby
-# config/initializers/kidsmin.rb
-Kidsmin.configure do |config|
+# config/initializers/kidspire.rb
+Kidspire.configure do |config|
   config.pco_client_id     = ENV['PCO_CLIENT_ID']      # optional
   config.pco_client_secret = ENV['PCO_CLIENT_SECRET']  # optional
   config.pco_redirect_uri  = ENV['PCO_REDIRECT_URI']   # optional
@@ -222,13 +233,13 @@ To run both:
 
 ```ruby
 # Gemfile
-gem 'kidsmin'
+gem 'kidspire'
 gem 'churchcred'
 ```
 
 ```ruby
 # config/routes.rb
-mount Kidsmin::Engine    => '/'
+mount Kidspire::Engine   => '/'
 mount Churchcred::Engine => '/churchcred'
 ```
 

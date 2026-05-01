@@ -60,10 +60,10 @@ class RodauthMain < Rodauth::Rails::Auth
     send_email_auth_email do
       email      = account[login_column]
       full_token = "#{account_id}#{token_separator}#{email_auth_key_value}"
-      link = "#{Kidsmin.configuration.frontend_base_url}/auth/callback" \
+      link = "#{Kidspire.configuration.frontend_base_url}/auth/callback" \
              "?key=#{CGI.escape(full_token)}" \
              "&email=#{CGI.escape(email)}"
-      Rails.logger.warn("\n\n🔐 [kidsmin] Magic link for #{email}:\n#{link}\n\n")
+      Rails.logger.warn("\n\n🔐 [kidspire] Magic link for #{email}:\n#{link}\n\n")
       RodauthMailer.email_auth(email, link).deliver_later
     end
 

@@ -2,7 +2,7 @@
 set -e
 
 echo ""
-echo "=== kidsmin local setup ==="
+echo "=== kidspire local setup ==="
 echo ""
 
 # Ruby dependencies
@@ -44,5 +44,5 @@ echo "  4. Terminal 2: bun run dev"
 echo "  5. Open: http://localhost:3036"
 echo ""
 echo "  To set your account as admin:"
-echo "  bundle exec rails kidsmin:make_admin[your@email.com]"
+echo "  bundle exec rails kidspire:make_admin[your@email.com]"
 echo ""

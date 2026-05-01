@@ -1,16 +1,16 @@
 import { auth } from "@/lib/auth"
 
 const apiBase = (): string =>
-  window.__KIDSMIN_CONFIG__?.apiBaseUrl ?? import.meta.env.VITE_API_BASE_URL ?? "/api/v1"
+  window.__KIDSPIRE_CONFIG__?.apiBaseUrl ?? import.meta.env.VITE_API_BASE_URL ?? "/api/v1"
 
-class KidsminApiError extends Error {
+class KidspireApiError extends Error {
   constructor(
     message: string,
     public readonly code: string,
     public readonly status: number
   ) {
     super(message)
-    this.name = "KidsminApiError"
+    this.name = "KidspireApiError"
   }
 }
 
@@ -31,7 +31,7 @@ async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   const body = await response.json().catch(() => ({ error: "Unexpected response", code: "parse_error" }))
 
   if (!response.ok) {
-    throw new KidsminApiError(body.error ?? "Request failed", body.code ?? "unknown", response.status)
+    throw new KidspireApiError(body.error ?? "Request failed", body.code ?? "unknown", response.status)
   }
 
   return body as T
@@ -44,4 +44,4 @@ export const api = {
   delete: <T>(path: string)               => apiFetch<T>(path, { method: "DELETE" }),
 }
 
-export { KidsminApiError }
+export { KidspireApiError }

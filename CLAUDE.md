@@ -1,4 +1,4 @@
-# kidsmin
+# Kidspire (5stones Software)
 
 Read `ECOSYSTEM_CONTEXT.md` and `CLAUDE_CODE_CONTEXT.md` before doing anything.
 
@@ -31,19 +31,19 @@ curl http://localhost:3000/api/v1/events
 
 ## Key constraints
 
-- No Clerk, no kidsmin-cloud coupling
-- All tables namespaced: kidsmin_families, kidsmin_children, etc.
-- Routes via scope module: "kidsmin" in config/routes.rb (standalone mode)
+- No Clerk, no kidspire-cloud coupling
+- All tables namespaced: kidspire_families, kidspire_children, etc.
+- Routes via scope module: "kidspire" in config/routes.rb (standalone mode)
 - Blueprinter classes use ::Blueprinter::Base (fully qualified)
 - Sidekiq pinned to ~> 7.0 (connection_pool 2.x — Ruby 3.3 compat)
 - Gems that need explicit Gemfile entries: puma, kaminari, blueprinter, jwt, httparty, redis, rack-cors, rack-attack
 
 ## Architecture notes
 
-- Engine routes defined in config/routes.rb using scope module: "kidsmin"
+- Engine routes defined in config/routes.rb using scope module: "kidspire"
 - Vite served at :3036 with proxy to Rails; do NOT use :3000 for the browser
 - Admin identity: `accounts.admin` boolean column, embedded in JWT payload
-- PCO tokens encrypted via Kidsmin::Encryption (AES-256-GCM)
+- PCO tokens encrypted via Kidspire::Encryption (AES-256-GCM)
 
 ## Engineering Standards
 - **Autonomy:** Do not ask me to run commands in separate terminals. Use background processes (`&`) or `tmux` for long-running servers.

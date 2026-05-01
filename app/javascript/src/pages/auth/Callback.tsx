@@ -24,14 +24,14 @@ export default function AuthCallback() {
 
     auth.verifyKey(key)
       .then(async () => {
-        const inviteToken = sessionStorage.getItem("kidsmin_invite_token")
+        const inviteToken = sessionStorage.getItem("kidspire_invite_token")
         if (inviteToken) {
           try {
             await api.post(`/invitations/${inviteToken}/accept`, {})
           } catch {
             // Invitation may already be accepted — proceed anyway
           }
-          sessionStorage.removeItem("kidsmin_invite_token")
+          sessionStorage.removeItem("kidspire_invite_token")
         }
         navigate("/portal/dashboard", { replace: true })
       })

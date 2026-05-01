@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { Link } from "react-router-dom"
-import { api, KidsminApiError } from "@/lib/api"
+import { api, KidspireApiError } from "@/lib/api"
 import { Button } from "@/components/ui/Button"
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -245,7 +245,7 @@ export default function QuickAdd() {
         setPcoStep("skipped")
       }
     } catch (err) {
-      setError(err instanceof KidsminApiError ? err.message : "Something went wrong")
+      setError(err instanceof KidspireApiError ? err.message : "Something went wrong")
     } finally {
       setSubmitting(false)
     }
@@ -293,7 +293,7 @@ export default function QuickAdd() {
                 : pcoStep === "skipped" ? "Planning Center not connected"
                 : pcoStep === "queued"  ? "Saving to Planning Center…"
                 : "",
-        detail:   pcoStep === "synced"  ? "Person and children created in PCO with kidsmin tag."
+        detail:   pcoStep === "synced"  ? "Person and children created in PCO with kidspire tag."
                 : pcoStep === "skipped" ? "Connect PCO in admin settings to enable this step."
                 : pcoStep === "queued"  ? "Running in the background — this usually takes a few seconds."
                 : "",
@@ -306,7 +306,7 @@ export default function QuickAdd() {
       <div className="min-h-screen bg-background">
         <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
           <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3 md:px-6">
-            <Link to="/portal/dashboard" className="font-display text-xl font-bold text-primary">kidsmin</Link>
+            <Link to="/portal/dashboard" className="font-display text-xl font-bold text-primary">kidspire</Link>
             <span className="text-sm font-semibold text-muted-foreground">Admin</span>
           </div>
         </header>
@@ -364,7 +364,7 @@ export default function QuickAdd() {
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3 md:px-6">
-          <Link to="/portal/dashboard" className="font-display text-xl font-bold text-primary">kidsmin</Link>
+          <Link to="/portal/dashboard" className="font-display text-xl font-bold text-primary">kidspire</Link>
           <span className="text-sm font-semibold text-muted-foreground">Admin · Quick Add</span>
         </div>
       </header>

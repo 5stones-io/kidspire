@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#5B21B6" />
+
+    <title><%= content_for?(:title) ? yield(:title) + " — kidspire" : "kidspire" %></title>
+
+    <%# Default theme variables — host app/theme gem can override by loading its own
+        stylesheet AFTER this one and re-declaring :root variables. %>
+    <%= stylesheet_link_tag "kidspire/default_theme", media: "all" %>
+
+    <%# Vite entrypoint — loads React app + Tailwind styles %>
+    <%= vite_client_tag %>
+    <%= vite_javascript_tag "application", defer: true %>
+
+    <%# Allow host app to inject additional head content (analytics, fonts, etc.) %>
+    <%= yield :head %>
+  </head>
+
+  <body class="bg-[var(--kidspire-color-background)] text-[var(--kidspire-color-text)] antialiased">
+    <%# Host app can insert a server-rendered nav or banner above the React app %>
+    <%= yield :before_app %>
+
+    <div id="root"></div>
+
+    <%# Inline config passed to the frontend — avoids a round-trip API call on load %>
+    <script>
+      window.__KIDSPIRE_CONFIG__ = {
+        apiBaseUrl: "<%= Kidspire.configuration.frontend_base_url || "" %>/api/v1"
+      };
+    </script>
+
+    <%= yield :after_app %>
+  </body>
+</html>

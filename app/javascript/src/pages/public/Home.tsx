@@ -1,10 +1,10 @@
 import { useState } from "react"
-import { Nav } from "@/components/kidsmin/Nav"
-import { Footer } from "@/components/kidsmin/Footer"
+import { Nav } from "@/components/kidspire/Nav"
+import { Footer } from "@/components/kidspire/Footer"
 import { ButtonLink } from "@/components/ui/Button"
 import { useEvents } from "@/hooks/useEvents"
-import { EventCard } from "@/components/kidsmin/EventCard"
-import { QuickRegisterModal } from "@/components/kidsmin/QuickRegisterModal"
+import { EventCard } from "@/components/kidspire/EventCard"
+import { QuickRegisterModal } from "@/components/kidspire/QuickRegisterModal"
 import type { Event } from "@/types"
 
 const features = [
@@ -84,7 +84,7 @@ export default function Home() {
       {/* Features */}
       <section className="mx-auto max-w-6xl px-4 py-20 md:px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <span className="text-sm font-bold uppercase tracking-wider text-primary">What is kidsmin?</span>
+          <span className="text-sm font-bold uppercase tracking-wider text-primary">What is kidspire?</span>
           <h2 className="mt-3 font-display text-4xl font-bold text-foreground md:text-5xl">
             Big faith. Bigger fun.
           </h2>

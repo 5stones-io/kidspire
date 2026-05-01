@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Nav } from "@/components/kidsmin/Nav"
+import { Nav } from "@/components/kidspire/Nav"
 import { auth } from "@/lib/auth"
 import { Button } from "@/components/ui/Button"
 
@@ -14,7 +14,7 @@ export default function Login() {
               <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-primary text-2xl text-primary-foreground">
                 ✝
               </div>
-              <h1 className="mt-4 font-display text-3xl font-bold">Welcome to kidsmin</h1>
+              <h1 className="mt-4 font-display text-3xl font-bold">Welcome to kidspire</h1>
               <p className="mt-2 text-sm text-muted-foreground">
                 Sign in to manage your family, register for events, and stay connected.
               </p>
@@ -81,7 +81,7 @@ function EmailForm() {
       </form>
 
       <div className="mt-5 rounded-2xl bg-secondary/60 p-4 text-center text-sm">
-        <p className="font-semibold">New to kidsmin?</p>
+        <p className="font-semibold">New to kidspire?</p>
         <p className="mt-0.5 text-muted-foreground">Enter your email above — we'll create your account automatically.</p>
       </div>
     </>

@@ -1,6 +1,6 @@
 namespace :pco do
   desc <<~DESC
-    Find all PCO households that contain a child and apply the kidsmin tag
+    Find all PCO households that contain a child and apply the kidspire tag
     to each household's primary contact.
 
     Runs in DRY-RUN mode by default (no changes made).
@@ -12,15 +12,15 @@ namespace :pco do
   DESC
   task tag_families_with_children: :environment do
     apply = ENV["APPLY"] == "true"
-    tag_name = Kidsmin.configuration.pco_kids_ministry_tag.presence || "kidsmin"
+    tag_name = Kidspire.configuration.pco_kids_ministry_tag.presence || "kidspire"
 
     puts ""
-    puts "=== PCO kidsmin tag backfill ==="
+    puts "=== PCO kidspire tag backfill ==="
     puts "  Tag name : #{tag_name}"
     puts "  Mode     : #{apply ? "APPLY (will write to PCO)" : "DRY RUN (no changes)"}"
     puts ""
 
-    client = Kidsmin::PcoClient.new
+    client = Kidspire::PcoClient.new
 
     # ── 1. Find the tag ──────────────────────────────────────────────────────
     puts "▶ Looking up tag '#{tag_name}'…"

@@ -1,6 +1,6 @@
 class RodauthMailer < ApplicationMailer
   def email_auth(email, magic_link_url)
     @magic_link_url = magic_link_url
-    mail(to: email, subject: "Your kidsmin sign-in link")
+    mail(to: email, subject: "Your kidspire sign-in link")
   end
 end

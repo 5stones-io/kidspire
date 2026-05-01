@@ -1,8 +1,8 @@
-const AUTH_TOKEN_KEY = "kidsmin_token"
+const AUTH_TOKEN_KEY = "kidspire_token"
 
 declare global {
   interface Window {
-    __KIDSMIN_CONFIG__?: {
+    __KIDSPIRE_CONFIG__?: {
       apiBaseUrl: string
     }
   }
@@ -10,7 +10,7 @@ declare global {
 
 function authBase(): string {
   const apiBase =
-    window.__KIDSMIN_CONFIG__?.apiBaseUrl ??
+    window.__KIDSPIRE_CONFIG__?.apiBaseUrl ??
     import.meta.env.VITE_API_BASE_URL ??
     "http://localhost:3000/api/v1"
   return apiBase.replace(/\/api\/v1\/?$/, "")

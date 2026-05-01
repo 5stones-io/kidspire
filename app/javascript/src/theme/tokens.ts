@@ -1,5 +1,5 @@
 /**
- * Typed accessors for the kidsmin CSS variable contract.
+ * Typed accessors for the kidspire CSS variable contract.
  *
  * These read the live computed value at call time, so they always reflect
  * the current theme — including overrides set by a host app theme gem.
@@ -19,35 +19,35 @@ function cssVar(name: string): string {
 
 export const tokens = {
   color: {
-    primary:      () => cssVar("--kidsmin-color-primary"),
-    primaryFg:    () => cssVar("--kidsmin-color-primary-fg"),
-    primaryHover: () => cssVar("--kidsmin-color-primary-hover"),
-    accent:       () => cssVar("--kidsmin-color-accent"),
-    accentFg:     () => cssVar("--kidsmin-color-accent-fg"),
-    accentHover:  () => cssVar("--kidsmin-color-accent-hover"),
-    background:   () => cssVar("--kidsmin-color-background"),
-    surface:      () => cssVar("--kidsmin-color-surface"),
-    text:         () => cssVar("--kidsmin-color-text"),
-    textMuted:    () => cssVar("--kidsmin-color-text-muted"),
-    textInverse:  () => cssVar("--kidsmin-color-text-inverse"),
-    border:       () => cssVar("--kidsmin-color-border"),
-    success:      () => cssVar("--kidsmin-color-success"),
-    warning:      () => cssVar("--kidsmin-color-warning"),
-    error:        () => cssVar("--kidsmin-color-error"),
+    primary:      () => cssVar("--kidspire-color-primary"),
+    primaryFg:    () => cssVar("--kidspire-color-primary-fg"),
+    primaryHover: () => cssVar("--kidspire-color-primary-hover"),
+    accent:       () => cssVar("--kidspire-color-accent"),
+    accentFg:     () => cssVar("--kidspire-color-accent-fg"),
+    accentHover:  () => cssVar("--kidspire-color-accent-hover"),
+    background:   () => cssVar("--kidspire-color-background"),
+    surface:      () => cssVar("--kidspire-color-surface"),
+    text:         () => cssVar("--kidspire-color-text"),
+    textMuted:    () => cssVar("--kidspire-color-text-muted"),
+    textInverse:  () => cssVar("--kidspire-color-text-inverse"),
+    border:       () => cssVar("--kidspire-color-border"),
+    success:      () => cssVar("--kidspire-color-success"),
+    warning:      () => cssVar("--kidspire-color-warning"),
+    error:        () => cssVar("--kidspire-color-error"),
   },
   font: {
-    heading: () => cssVar("--kidsmin-font-heading"),
-    body:    () => cssVar("--kidsmin-font-body"),
-    mono:    () => cssVar("--kidsmin-font-mono"),
+    heading: () => cssVar("--kidspire-font-heading"),
+    body:    () => cssVar("--kidspire-font-body"),
+    mono:    () => cssVar("--kidspire-font-mono"),
   },
   radius: {
-    base: () => cssVar("--kidsmin-radius"),
-    sm:   () => cssVar("--kidsmin-radius-sm"),
-    full: () => cssVar("--kidsmin-radius-full"),
+    base: () => cssVar("--kidspire-radius"),
+    sm:   () => cssVar("--kidspire-radius-sm"),
+    full: () => cssVar("--kidspire-radius-full"),
   },
   shadow: {
-    sm: () => cssVar("--kidsmin-shadow-sm"),
-    md: () => cssVar("--kidsmin-shadow-md"),
-    lg: () => cssVar("--kidsmin-shadow-lg"),
+    sm: () => cssVar("--kidspire-shadow-sm"),
+    md: () => cssVar("--kidspire-shadow-md"),
+    lg: () => cssVar("--kidspire-shadow-lg"),
   },
 } as const

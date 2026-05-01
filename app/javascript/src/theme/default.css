@@ -1,43 +1,43 @@
 /* Vite-side copy of the CSS variable contract — loaded during dev for HMR. */
 
 :root {
-  --kidsmin-font-heading: 'Fredoka', 'Nunito', system-ui, sans-serif;
-  --kidsmin-font-body:    'Nunito', system-ui, sans-serif;
-  --kidsmin-font-mono:    'JetBrains Mono', 'Fira Code', monospace;
+  --kidspire-font-heading: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  --kidspire-font-body:    'Nunito', system-ui, sans-serif;
+  --kidspire-font-mono:    'JetBrains Mono', 'Fira Code', monospace;
 
-  --kidsmin-color-primary:       oklch(0.4 0.2 290);
-  --kidsmin-color-primary-fg:    oklch(0.99 0.01 85);
-  --kidsmin-color-primary-hover: oklch(0.35 0.22 290);
+  --kidspire-color-primary:       oklch(0.4 0.2 290);
+  --kidspire-color-primary-fg:    oklch(0.99 0.01 85);
+  --kidspire-color-primary-hover: oklch(0.35 0.22 290);
 
-  --kidsmin-color-accent:        oklch(0.82 0.17 80);
-  --kidsmin-color-accent-fg:     oklch(0.25 0.06 290);
-  --kidsmin-color-accent-hover:  oklch(0.75 0.18 75);
+  --kidspire-color-accent:        oklch(0.82 0.17 80);
+  --kidspire-color-accent-fg:     oklch(0.25 0.06 290);
+  --kidspire-color-accent-hover:  oklch(0.75 0.18 75);
 
-  --kidsmin-color-background: oklch(0.985 0.012 85);
-  --kidsmin-color-surface:    oklch(1 0 0);
-  --kidsmin-color-secondary:  oklch(0.95 0.04 295);
-  --kidsmin-color-cream:      oklch(0.97 0.03 85);
+  --kidspire-color-background: oklch(0.985 0.012 85);
+  --kidspire-color-surface:    oklch(1 0 0);
+  --kidspire-color-secondary:  oklch(0.95 0.04 295);
+  --kidspire-color-cream:      oklch(0.97 0.03 85);
 
-  --kidsmin-color-text:         oklch(0.22 0.05 290);
-  --kidsmin-color-text-muted:   oklch(0.5 0.03 285);
-  --kidsmin-color-text-inverse: oklch(0.99 0.01 85);
+  --kidspire-color-text:         oklch(0.22 0.05 290);
+  --kidspire-color-text-muted:   oklch(0.5 0.03 285);
+  --kidspire-color-text-inverse: oklch(0.99 0.01 85);
 
-  --kidsmin-color-border:       oklch(0.92 0.03 290);
-  --kidsmin-color-border-focus: oklch(0.5 0.2 290);
+  --kidspire-color-border:       oklch(0.92 0.03 290);
+  --kidspire-color-border-focus: oklch(0.5 0.2 290);
 
-  --kidsmin-color-success: oklch(0.55 0.18 155);
-  --kidsmin-color-warning: oklch(0.82 0.17 80);
-  --kidsmin-color-error:   oklch(0.6 0.22 25);
+  --kidspire-color-success: oklch(0.55 0.18 155);
+  --kidspire-color-warning: oklch(0.82 0.17 80);
+  --kidspire-color-error:   oklch(0.6 0.22 25);
 
-  --kidsmin-color-sky-soft:  oklch(0.92 0.06 230);
-  --kidsmin-color-pink-soft: oklch(0.92 0.06 10);
-  --kidsmin-color-mint-soft: oklch(0.92 0.07 160);
+  --kidspire-color-sky-soft:  oklch(0.92 0.06 230);
+  --kidspire-color-pink-soft: oklch(0.92 0.06 10);
+  --kidspire-color-mint-soft: oklch(0.92 0.07 160);
 
-  --kidsmin-radius:      1.5rem;
-  --kidsmin-radius-sm:   0.75rem;
-  --kidsmin-radius-full: 9999px;
+  --kidspire-radius:      1.5rem;
+  --kidspire-radius-sm:   0.75rem;
+  --kidspire-radius-full: 9999px;
 
-  --kidsmin-shadow-sm:      0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --kidsmin-shadow-md:      0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --kidsmin-shadow-playful: 0 18px 40px -20px rgba(91, 33, 182, 0.45);
+  --kidspire-shadow-sm:      0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --kidspire-shadow-md:      0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --kidspire-shadow-playful: 0 18px 40px -20px rgba(91, 33, 182, 0.45);
 }

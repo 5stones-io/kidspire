@@ -7,7 +7,7 @@ require "active_job/railtie"
 
 Bundler.require(*Rails.groups)
 
-module Kidsmin
+module Kidspire
   class Application < Rails::Application
     config.load_defaults 7.2
 

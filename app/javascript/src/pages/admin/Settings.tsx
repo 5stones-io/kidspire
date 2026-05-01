@@ -169,7 +169,7 @@ export default function AdminSettings() {
               type="text"
               value={settings.pco_kids_ministry_tag ?? ""}
               onChange={e => update("pco_kids_ministry_tag", e.target.value || null)}
-              placeholder="kidsmin"
+              placeholder="kidspire"
               className="h-11 w-full max-w-xs rounded-xl border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
@@ -177,7 +177,7 @@ export default function AdminSettings() {
           <div className="mb-5">
             <label className="text-sm font-semibold">Conflict resolution</label>
             <p className="text-xs text-muted-foreground mt-0.5 mb-2">
-              When a family exists in both kidsmin and PCO with different data, which wins?
+              When a family exists in both kidspire and PCO with different data, which wins?
             </p>
             <select
               value={settings.conflict_resolution}
@@ -185,14 +185,14 @@ export default function AdminSettings() {
               className="h-11 w-full max-w-xs rounded-xl border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             >
               <option value="pco_wins">PCO always wins</option>
-              <option value="kidsmin_wins">kidsmin always wins</option>
+              <option value="kidspire_wins">kidspire always wins</option>
               <option value="newest_wins">Most recently updated wins</option>
             </select>
           </div>
 
           <Toggle
             label="Import families from PCO"
-            desc="Sync people and households into kidsmin families"
+            desc="Sync people and households into kidspire families"
             checked={settings.inbound_people_sync}
             onChange={v => update("inbound_people_sync", v)}
           />
@@ -204,7 +204,7 @@ export default function AdminSettings() {
           />
           <Toggle
             label="Push profile updates to PCO"
-            desc="When a family edits their profile in kidsmin, update PCO"
+            desc="When a family edits their profile in kidspire, update PCO"
             checked={settings.outbound_people_sync}
             onChange={v => update("outbound_people_sync", v)}
           />

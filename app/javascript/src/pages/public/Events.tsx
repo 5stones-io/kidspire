@@ -1,9 +1,9 @@
 import { useState } from "react"
-import { Nav } from "@/components/kidsmin/Nav"
-import { Footer } from "@/components/kidsmin/Footer"
+import { Nav } from "@/components/kidspire/Nav"
+import { Footer } from "@/components/kidspire/Footer"
 import { useEvents } from "@/hooks/useEvents"
-import { EventCard } from "@/components/kidsmin/EventCard"
-import { QuickRegisterModal } from "@/components/kidsmin/QuickRegisterModal"
+import { EventCard } from "@/components/kidspire/EventCard"
+import { QuickRegisterModal } from "@/components/kidspire/QuickRegisterModal"
 import { Button } from "@/components/ui/Button"
 import type { Event } from "@/types"
 

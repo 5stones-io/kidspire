@@ -1,6 +1,6 @@
-# kidsmin / churchcred Ecosystem — Shared Context
+# kidspire / churchcred Ecosystem — Shared Context
 
-This document describes the full ecosystem of kidsmin and churchcred repos. It lives in every repo in the family as `ECOSYSTEM_CONTEXT.md` and is read alongside each repo's own `CLAUDE_CODE_CONTEXT.md`.
+This document describes the full ecosystem of kidspire and churchcred repos. It lives in every repo in the family as `ECOSYSTEM_CONTEXT.md` and is read alongside each repo's own `CLAUDE_CODE_CONTEXT.md`.
 
 When working in any repo in this family, read this file first, then the repo-specific `CLAUDE_CODE_CONTEXT.md`.
 
@@ -11,13 +11,13 @@ When working in any repo in this family, read this file first, then the repo-spe
 | Repo | Type | Auth | PCO | Deploy |
 |---|---|---|---|---|
 | `churchcred` | Rails Engine gem · MIT · standalone | Own (Supabase Auth) | Own PCO app per church | Railway |
-| `kidsmin` | Rails Engine gem · MIT · standalone | Supabase Auth | Own PCO app per church | Railway |
+| `kidspire` | Rails Engine gem · MIT · standalone | Supabase Auth | Own PCO app per church | Railway |
 | `kidsmin-cloud` | SaaS platform · Next.js | Clerk | Platform PCO OAuth app | Vercel + Railway |
 | `churchcred-cloud` | SaaS app · Rails + React | Clerk (via kidsmin-cloud JWT) | Platform PCO OAuth app | Railway |
 
 ### Standalone vs cloud
 
-The standalone gems (`churchcred`, `kidsmin`) are fully self-contained. A church can deploy either gem independently with zero dependency on the platform or each other. They are MIT licensed and Railway-deployable via template.
+The standalone gems (`churchcred`, `kidspire`) are fully self-contained. A church can deploy either gem independently with zero dependency on the platform or each other. They are MIT licensed and Railway-deployable via template.
 
 The cloud apps (`kidsmin-cloud`, `churchcred-cloud`) are the hosted SaaS layer. They use the gem logic as their core and add Clerk SSO, multi-tenancy, and platform-level PCO OAuth on top.
 
@@ -50,7 +50,7 @@ These decisions apply across all four repos unless a repo-specific doc explicitl
 - Typography: friendly, readable, not corporate
 - Tone: warm, faith-forward, built for families — not enterprise SaaS
 
-All four repos should feel like they came from the same family visually. A parent using kidsmin on Sunday and churchcred on Wednesday should see the same design language.
+All four repos should feel like they came from the same family visually. A parent using kidspire on Sunday and churchcred on Wednesday should see the same design language.
 
 ### API conventions
 - JSON API, versioned under `/api/v1/`
@@ -90,19 +90,19 @@ Worker deployed as separate Railway service, same repo, start command overridden
 ## Data Model Conventions
 
 ### Naming
-- Gem tables are namespaced: `kidsmin_families`, `kidsmin_children`, `churchcred_points`, etc.
+- Gem tables are namespaced: `kidspire_families`, `kidspire_children`, `churchcred_points`, etc.
 - Cloud schema tables are not namespaced (they live in tenant-isolated schemas)
 
 ### Cross-gem relationships (when both gems mounted together)
-When `kidsmin` and `churchcred` are mounted in the same host app, churchcred reads kidsmin tables to resolve family/child identity:
+When `kidspire` and `churchcred` are mounted in the same host app, churchcred reads kidspire tables to resolve family/child identity:
 
 ```ruby
 # In host app (not inside either gem)
-# churchcred looks up children via kidsmin
+# churchcred looks up children via kidspire
 module Churchcred
   class Point < ApplicationRecord
-    belongs_to :child, class_name: 'Kidsmin::Child',
-                       foreign_key: 'kidsmin_child_id'
+    belongs_to :child, class_name: 'Kidspire::Child',
+                       foreign_key: 'kidspire_child_id'
   end
 end
 ```
@@ -112,7 +112,7 @@ Neither gem should `require` or `depend_on` the other — the relationship is de
 ### Mounting both gems together
 ```ruby
 # config/routes.rb in host app
-mount Kidsmin::Engine    => '/'
+mount Kidspire::Engine   => '/'
 mount Churchcred::Engine => '/churchcred'
 ```
 
@@ -122,7 +122,7 @@ mount Churchcred::Engine => '/churchcred'
 
 PCO resources used across the ecosystem:
 
-| PCO Resource | kidsmin use | churchcred use |
+| PCO Resource | kidspire use | churchcred use |
 |---|---|---|
 | `People::Person` | Family/child profiles | Resolve check-in to child |
 | `People::Household` | Family grouping | — |
@@ -135,51 +135,51 @@ PCO resources used across the ecosystem:
 
 ---
 
-## kidsmin — Key Concepts
+## kidspire — Key Concepts
 
-### kidsmin owns its own database
-PCO is a sync source and sync target, not the primary system of record. kidsmin's Postgres tables are authoritative. PCO sync is bidirectional and optional per church:
+### kidspire owns its own database
+PCO is a sync source and sync target, not the primary system of record. kidspire's Postgres tables are authoritative. PCO sync is bidirectional and optional per church:
 
-- **Inbound sync:** Pull families, children, events from PCO → kidsmin tables
-- **Outbound sync:** Push profile updates and event registrations from kidsmin → PCO (optional, per church setting)
+- **Inbound sync:** Pull families, children, events from PCO → kidspire tables
+- **Outbound sync:** Push profile updates and event registrations from kidspire → PCO (optional, per church setting)
 
 ### Sync settings (per church)
 ```ruby
-# kidsmin_sync_settings table
-inbound_people_sync:  boolean  # pull PCO people → kidsmin profiles
-outbound_people_sync: boolean  # push kidsmin profile changes → PCO
-inbound_events_sync:  boolean  # pull PCO calendar events → kidsmin events
-outbound_registrations_sync: boolean  # push kidsmin registrations → PCO
+# kidspire_sync_settings table
+inbound_people_sync:  boolean  # pull PCO people → kidspire profiles
+outbound_people_sync: boolean  # push kidspire profile changes → PCO
+inbound_events_sync:  boolean  # pull PCO calendar events → kidspire events
+outbound_registrations_sync: boolean  # push kidspire registrations → PCO
 sync_frequency_hours: integer  # default 6
 last_synced_at:       datetime
 ```
 
 ### Templating system (theme layer)
-kidsmin provides a **theme framework** — churches supply their own look, kidsmin provides the functionality. This works via Rails Engine view overrides + a component library.
+kidspire provides a **theme framework** — churches supply their own look, kidspire provides the functionality. This works via Rails Engine view overrides + a component library.
 
 **How it works:**
-1. kidsmin ships default views in `app/views/kidsmin/`
-2. A church's theme (a separate gem or local app) overrides views by placing files at the same paths in the host app's `app/views/kidsmin/`
+1. kidspire ships default views in `app/views/kidspire/`
+2. A church's theme (a separate gem or local app) overrides views by placing files at the same paths in the host app's `app/views/kidspire/`
 3. Rails automatically prefers host app views over engine views
-4. kidsmin ships a set of **theme variables** (Tailwind CSS custom properties) that themes set to control color, typography, and spacing
-5. kidsmin's React components accept a `theme` prop that maps to these variables
+4. kidspire ships a set of **theme variables** (Tailwind CSS custom properties) that themes set to control color, typography, and spacing
+5. kidspire's React components accept a `theme` prop that maps to these variables
 
 **Theme contract — what a theme must provide:**
 ```css
 /* Required CSS custom properties */
---kidsmin-color-primary:     /* main brand color */
---kidsmin-color-accent:      /* CTA / highlight color */
---kidsmin-color-background:  /* page background */
---kidsmin-color-text:        /* body text */
---kidsmin-font-heading:      /* heading font family */
---kidsmin-font-body:         /* body font family */
---kidsmin-radius:            /* border radius base */
+--kidspire-color-primary:     /* main brand color */
+--kidspire-color-accent:      /* CTA / highlight color */
+--kidspire-color-background:  /* page background */
+--kidspire-color-text:        /* body text */
+--kidspire-font-heading:      /* heading font family */
+--kidspire-font-body:         /* body font family */
+--kidspire-radius:            /* border radius base */
 ```
 
 **Theme contract — what a theme can override:**
-- Any view in `app/views/kidsmin/` (layout, pages, partials)
+- Any view in `app/views/kidspire/` (layout, pages, partials)
 - Any component in `app/javascript/src/components/` via host app src
-- The main layout (`kidsmin/layouts/application.html.erb`)
+- The main layout (`kidspire/layouts/application.html.erb`)
 
 **What a theme cannot change:**
 - Routes
@@ -189,21 +189,21 @@ kidsmin provides a **theme framework** — churches supply their own look, kidsm
 - API endpoints
 
 **Default theme:**
-kidsmin ships a default theme matching the ecosystem design system (violet + amber, rounded, warm). churchcred's default theme matches identically so they look native when mounted together.
+kidspire ships a default theme matching the ecosystem design system (violet + amber, rounded, warm). churchcred's default theme matches identically so they look native when mounted together.
 
 ---
 
 ## churchcred — Key Concepts
 
 ### churchcred is the points/rewards layer
-It does not manage family identity or event registration — kidsmin does that. churchcred's job is:
+It does not manage family identity or event registration — kidspire does that. churchcred's job is:
 - Award points to children based on check-in events from PCO
 - Track point history
 - Define and award badges based on point thresholds
 - Optionally show a leaderboard
 
-### churchcred reads kidsmin for identity (when co-mounted)
-When both gems are mounted, churchcred reads `kidsmin_families` and `kidsmin_children` for identity. When running standalone, churchcred has its own lightweight person model.
+### churchcred reads kidspire for identity (when co-mounted)
+When both gems are mounted, churchcred reads `kidspire_families` and `kidspire_children` for identity. When running standalone, churchcred has its own lightweight person model.
 
 ### Points sources
 ```
@@ -237,17 +237,17 @@ bonus     → one-off admin award
 ```
 churchcred (gem)
   └── standalone: own auth, own PCO, own DB
-  └── mountable alongside kidsmin in host app
+  └── mountable alongside kidspire in host app
   └── core logic reused by churchcred-cloud
 
-kidsmin (gem)
+kidspire (gem)
   └── standalone: Supabase Auth, own PCO, own DB
   └── mountable alongside churchcred in host app
   └── core logic reused by kidsmin-cloud
   └── theme framework: view overrides + CSS variables
 
 kidsmin-cloud (platform)
-  └── requires kidsmin gem
+  └── requires kidspire gem
   └── Clerk SSO (replaces Supabase Auth)
   └── multi-tenant: schema-per-tenant Postgres
   └── PCO OAuth intermediary for all platform apps
@@ -266,10 +266,10 @@ churchcred-cloud
 
 | Concern | Lives in |
 |---|---|
-| Family profile, children records | kidsmin |
-| Event listings, registrations | kidsmin |
-| PCO people + calendar sync | kidsmin |
-| Theme / view override system | kidsmin |
+| Family profile, children records | kidspire |
+| Event listings, registrations | kidspire |
+| PCO people + calendar sync | kidspire |
+| Theme / view override system | kidspire |
 | Points, badges, leaderboard | churchcred |
 | PCO check-in sync → points | churchcred |
 | Platform SSO (Clerk) | kidsmin-cloud |
@@ -286,8 +286,8 @@ When working in any repo in this family:
 
 1. **Read this file first**, then the repo-specific `CLAUDE_CODE_CONTEXT.md`
 2. **Mirror churchcred patterns** for anything not explicitly specified — naming, structure, deployment config, PCO client pattern
-3. **Never couple standalone gems to cloud apps** — no Clerk imports, no kidsmin-cloud references inside `kidsmin` or `churchcred`
-4. **Namespace everything in gems** — models, controllers, jobs, helpers all under `Kidsmin::` or `Churchcred::`
+3. **Never couple standalone gems to cloud apps** — no Clerk imports, no kidsmin-cloud references inside `kidspire` or `churchcred`
+4. **Namespace everything in gems** — models, controllers, jobs, helpers all under `Kidspire::` or `Churchcred::`
 5. **Design system consistency** — all UIs use the same violet/amber/rounded design language
 6. **Error shape is universal** — `{ error: String, code: String }` everywhere
 7. **PCO tokens always encrypted** — never stored plaintext, use the shared `Encryption` module pattern
@@ -300,12 +300,12 @@ When working in any repo in this family:
 All repos live under: `github.com/chadjsdev`
 
 - `github.com/chadjsdev/churchcred` — standalone gem ✓ (exists)
-- `github.com/chadjsdev/kidsmin` — standalone gem (building)
+- `github.com/chadjsdev/kidspire` — standalone gem (building)
 - `github.com/chadjsdev/kidsmin-cloud` — SaaS platform (building)
 - `github.com/chadjsdev/churchcred-cloud` — SaaS app (future)
 
 ---
 
-*Ecosystem context — kidsmin / churchcred family*
+*Ecosystem context — kidspire / churchcred family*
 *Jubilee Christian Center · Fairfax, Virginia*
 *Last updated: April 2026*
