@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    kidspire (0.1.0)
+    kidspire (0.1.1)
       bcrypt (~> 3.1)
       blueprinter
       httparty
