@@ -11,6 +11,7 @@ Rails.application.configure do
   config.log_level  = ENV.fetch("RAILS_LOG_LEVEL", "info").to_sym
   config.log_tags   = [:request_id]
   config.force_ssl  = true
+  config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
 
   config.active_support.report_deprecations = false
   config.active_record.dump_schema_after_migration = false
