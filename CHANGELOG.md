@@ -19,6 +19,13 @@ Pre-1.0 (`0.x.y`): minor bumps may include breaking changes as the API stabilise
 
 ---
 
+## [0.1.1] — 2026-05-01                                                     
+                                                        
+### Fixed
+- Fixed Vite dev server startup (use local npm binary instead of vite_rails 
+CLI)                                                                        
+- Removed stale supabase directory
+
 ## [0.1.0] — 2026-05-01
 
 ### Added
@@ -38,3 +45,4 @@ Pre-1.0 (`0.x.y`): minor bumps may include breaking changes as the API stabilise
 
 [Unreleased]: https://github.com/5stones-io/kidspire/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/5stones-io/kidspire/releases/tag/v0.1.0
+[0.1.2]: https://github.com/5stones-io/kidspire/releases/tag/v0.1.2
