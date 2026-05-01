@@ -1,14 +1,20 @@
-require_relative "lib/kidsmin/version"
+require_relative "lib/kidspire/version"
 
 Gem::Specification.new do |spec|
-  spec.name        = "kidsmin"
-  spec.version     = Kidsmin::VERSION
+  spec.name        = "kidspire"
+  spec.version     = Kidspire::VERSION
   spec.authors     = ["Chad Singleton"]
-  spec.email       = ["chad@jubileechurch.com"]
+  spec.email       = ["hello@5stones.io"]
   spec.summary     = "Self-hostable children's ministry portal — family profiles, event registration, and PCO sync"
   spec.description = "Open source children's ministry platform. Mountable Rails Engine with React/Vite frontend, Rodauth-powered passwordless auth, and bidirectional Planning Center Online sync."
-  spec.homepage    = "https://github.com/chadjsdev/kidsmin"
+  spec.homepage    = "https://5stones.io/kidspire"
   spec.license     = "MIT"
+
+  spec.metadata = {
+    "homepage_uri"      => "https://5stones.io/kidspire",
+    "source_code_uri"   => "https://github.com/5stones-io/kidspire",
+    "bug_tracker_uri"   => "https://github.com/5stones-io/kidspire/issues"
+  }
 
   spec.files = Dir[
     "app/**/*",

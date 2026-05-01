@@ -2,6 +2,7 @@
 .env
 .env.local
 .env.*.local
+.env.*
 
 # Rails
 log/
@@ -34,3 +35,8 @@ Thumbs.db
 
 # SAMPLE
 sample/
+CLAUDE_CODE_CONTEXT.md
+CLAUDE.md
+CLAUDE_CODE_CONTEXT.md
+CLAUDE.md
+ECOSYSTEM_CONTEXT.md

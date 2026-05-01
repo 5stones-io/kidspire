@@ -1,23 +1,22 @@
-# kidsmin
+# Kidspire
 
 A self-hostable children's ministry portal built as a Rails Engine gem. Family profiles, children management, event registration, and Planning Center sync — all in a single deployable package.
 
-MIT licensed. No dependency on any hosted platform.
+Part of the [5stones Software](https://5stones.io) suite. MIT licensed. No dependency on any hosted platform.
 
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/your-template-id)
 
 ---
 
-## Part of the kidsmin/churchcred family
+## Part of the 5stones suite
 
 | Repo | What it is |
 |---|---|
-| **`kidsmin`** (this repo) | Standalone gem. Self-hostable. MIT. |
-| `kidsmin-cloud` | Hosted SaaS platform built on this gem. Clerk SSO. Multi-tenant. |
-| `churchcred` | Standalone points/badges gem. Self-hostable. MIT. Works alongside kidsmin. |
-| `churchcred-cloud` | Hosted SaaS version of churchcred. Plugs into kidsmin-cloud. |
+| **`kidspire`** (this repo) | Kids ministry portal. Standalone. Self-hostable. MIT. |
+| `churchcred` | Standalone points/badges gem. Self-hostable. MIT. Works alongside Kidspire. |
+| More coming | Youthspire, Seniorspire — built on the same Inspire framework |
 
-Want managed hosting instead of self-hosting? See [kidsmin-cloud](https://github.com/chadjsdev/kidsmin-cloud).
+> Built by [5stones Software](https://5stones.io) — open source tools churches can actually own.
 
 ---
 
@@ -61,8 +60,8 @@ The fastest path is one-click Railway deploy:
 ### Local setup
 
 ```bash
-git clone https://github.com/chadjsdev/kidsmin
-cd kidsmin
+git clone https://github.com/5stones-io/kidspire
+cd kidspire
 cp .env.example .env   # fill in values
 bundle install
 bun install
@@ -163,7 +162,7 @@ end
 4. Select scopes: `people`, `check_ins`, `services`
 5. Copy the **Client ID** and **Client Secret**
 
-### Step 2 — Enter credentials in kidsmin
+### Step 2 — Enter credentials in Kidspire
 
 1. Log in as admin
 2. Navigate to **PCO Sync** → **PCO API Configuration**
@@ -171,7 +170,7 @@ end
 
 ### Step 3 — Authorize
 
-Click **Connect PCO** — approve the PCO consent screen. kidsmin stores your access and refresh tokens automatically.
+Click **Connect PCO** — approve the PCO consent screen. Kidspire stores your access and refresh tokens automatically.
 
 ---
 
@@ -217,7 +216,7 @@ Rails default `/up` endpoint. Railway health checks hit this automatically.
 
 ## Relationship to churchcred
 
-`kidsmin` and `churchcred` are designed to run alongside each other. kidsmin handles family identity and event management. churchcred handles points, badges, and check-in rewards. They share the same PCO connection and the same family/child data model.
+Kidspire and churchcred are designed to run alongside each other. Kidspire handles family identity and event management. churchcred handles points, badges, and check-in rewards. They share the same PCO connection and the same family/child data model.
 
 To run both:
 
@@ -229,7 +228,7 @@ gem 'churchcred'
 
 ```ruby
 # config/routes.rb
-mount Kidsmin::Engine   => '/'
+mount Kidsmin::Engine    => '/'
 mount Churchcred::Engine => '/churchcred'
 ```
 
@@ -237,7 +236,7 @@ mount Churchcred::Engine => '/churchcred'
 
 ## Contributing
 
-Open issues before large PRs. The gem's data model and API surface affect kidsmin-cloud — breaking changes need coordination.
+Open issues before large PRs. See [5stones.io](https://5stones.io) for the broader suite roadmap.
 
 ---
 
@@ -247,5 +246,4 @@ MIT — see `LICENSE`
 
 ## Built by
 
-[Jubilee Christian Center](https://jcc.org) · Fairfax, Virginia
-Children's Ministry Technology Team
+[5stones Software](https://5stones.io) · Open source tools for the local church
