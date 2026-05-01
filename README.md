@@ -245,6 +245,49 @@ mount Churchcred::Engine => '/churchcred'
 
 ---
 
+## Versioning
+
+Kidspire follows [Semantic Versioning](https://semver.org). See [CHANGELOG.md](CHANGELOG.md) for the full release history.
+
+| Bump | When |
+|------|------|
+| **MAJOR** | Breaking API, mount interface, or schema changes requiring manual intervention |
+| **MINOR** | New features or endpoints (backwards compatible) |
+| **PATCH** | Bug fixes, security patches, dependency updates |
+
+> Pre-1.0 (`0.x.y`): minor bumps may include breaking changes while the API stabilises.
+
+---
+
+## Releasing a new version
+
+Uses [gem-release](https://github.com/svenfuchs/gem-release) to bump, tag, and push in one step.
+
+**1. Update CHANGELOG.md** — move entries from `[Unreleased]` into a new versioned section and update the diff links at the bottom.
+
+**2. Bump the version and release:**
+
+```bash
+# Patch release (0.1.0 → 0.1.1) — bug fixes only
+gem bump --version patch --tag --push && gem release
+
+# Minor release (0.1.0 → 0.2.0) — new features
+gem bump --version minor --tag --push && gem release
+
+# Major release (0.1.0 → 1.0.0) — breaking changes
+gem bump --version major --tag --push && gem release
+```
+
+This will:
+- Update `lib/kidspire/version.rb`
+- Commit and tag `v0.x.y`
+- Push the commit and tag to GitHub
+- Build and push the gem to RubyGems
+
+**3. Create a GitHub release** — go to `github.com/5stones-io/kidspire/releases` and publish release notes from the CHANGELOG entry.
+
+---
+
 ## Contributing
 
 Open issues before large PRs. See [5stones.io](https://5stones.io) for the broader suite roadmap.

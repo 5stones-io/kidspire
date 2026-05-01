@@ -42,4 +42,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "rack-attack"
   spec.add_dependency "kaminari"
   spec.add_dependency "vite_rails"
+
+  spec.add_development_dependency "gem-release"
 end
