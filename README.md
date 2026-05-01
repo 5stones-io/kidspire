@@ -27,7 +27,7 @@ Want managed hosting instead of self-hosting? See [kidsmin-cloud](https://github
 - **Children management** — name, birthdate, grade, allergies/notes per child
 - **Event registration** — public event listings with per-child signup forms
 - **Planning Center sync** — connect your PCO account; family and child records sync automatically
-- **Supabase Auth** — email magic link, Google OAuth, Apple OAuth — no password required
+- **Passwordless auth** — email magic link via Rodauth — no password required
 
 ---
 
@@ -38,8 +38,8 @@ Want managed hosting instead of self-hosting? See [kidsmin-cloud](https://github
 | Backend | Ruby on Rails (API + Engine) |
 | Frontend | React + Vite + TypeScript |
 | Styling | Tailwind CSS + shadcn/ui |
-| Auth | Supabase Auth (magic link, Google, Apple) |
-| Database | PostgreSQL (via Supabase or your own Postgres) |
+| Auth | Rodauth (passwordless email magic link) |
+| Database | PostgreSQL |
 | Background jobs | Sidekiq + Redis |
 | Deployment | Railway (Procfile + railway.toml included) |
 
@@ -50,21 +50,24 @@ Want managed hosting instead of self-hosting? See [kidsmin-cloud](https://github
 The fastest path is one-click Railway deploy:
 
 1. Click **Deploy on Railway** above
-2. Add the **PostgreSQL** and **Redis** plugins to your Railway project
-3. Set the required environment variables (see below)
-4. Deploy — the app builds and runs automatically
+2. Fill in the required environment variables in the Railway template form
+3. Railway provisions PostgreSQL, Redis, and both services automatically
+4. Once deployed, open a Railway shell and grant admin to your account:
+   ```bash
+   railway run bundle exec rails console
+   # then: Account.find_by(email: 'you@yourchurch.org').update!(admin: true)
+   ```
 
-### Manual setup
+### Local setup
 
 ```bash
 git clone https://github.com/chadjsdev/kidsmin
 cd kidsmin
+cp .env.example .env   # fill in values
 bundle install
-npm install
+bun install
 bundle exec rails db:setup
-npm run dev        # frontend on :8080, proxies /api to :3000
-bundle exec rails s # Rails API on :3000
-bundle exec sidekiq # background jobs
+overmind start -f Procfile.dev  # Rails :3000, Vite :3036, Sidekiq
 ```
 
 ---
@@ -95,11 +98,11 @@ Configure in an initializer:
 ```ruby
 # config/initializers/kidsmin.rb
 Kidsmin.configure do |config|
-  config.supabase_url      = ENV['SUPABASE_URL']
-  config.supabase_anon_key = ENV['SUPABASE_ANON_KEY']
   config.pco_client_id     = ENV['PCO_CLIENT_ID']      # optional
   config.pco_client_secret = ENV['PCO_CLIENT_SECRET']  # optional
+  config.pco_redirect_uri  = ENV['PCO_REDIRECT_URI']   # optional
   config.encryption_key    = ENV['ENCRYPTION_KEY']
+  config.frontend_base_url = ENV['FRONTEND_BASE_URL']
 end
 ```
 
@@ -113,11 +116,21 @@ end
 |---|---|
 | `DATABASE_URL` | Postgres connection string. Auto-set by Railway PostgreSQL plugin. |
 | `REDIS_URL` | Redis connection string. Auto-set by Railway Redis plugin. |
-| `RAILS_MASTER_KEY` | Contents of `config/master.key` — decrypts credentials. |
-| `SUPABASE_URL` | Your Supabase project URL. |
-| `SUPABASE_ANON_KEY` | Supabase anon key (safe for browser). |
-| `SUPABASE_SERVICE_ROLE_KEY` | Service role key — server only. |
-| `ENCRYPTION_KEY` | 32-byte hex key for encrypting PCO tokens. `openssl rand -hex 32` |
+| `SECRET_KEY_BASE` | Rails secret key. Generate: `openssl rand -hex 64` |
+| `ENCRYPTION_KEY` | 32-byte hex key for encrypting PCO tokens. Generate: `openssl rand -hex 32` |
+| `FRONTEND_BASE_URL` | Public URL of your deployment. e.g. `https://your-app.up.railway.app` |
+| `VITE_API_BASE_URL` | API base URL baked into the frontend at build time. e.g. `https://your-app.up.railway.app/api/v1` |
+
+### Email (required for magic link auth)
+
+| Variable | Description |
+|---|---|
+| `SMTP_ADDRESS` | SMTP host. e.g. `smtp.resend.com` ([Resend](https://resend.com) recommended — free tier) |
+| `SMTP_PORT` | SMTP port. `465` for Resend. |
+| `SMTP_USERNAME` | SMTP username. `resend` for Resend. |
+| `SMTP_PASSWORD` | SMTP password / API key. |
+| `SMTP_DOMAIN` | Your verified sending domain. |
+| `MAILER_FROM` | From address. e.g. `noreply@yourchurch.org` |
 
 ### Optional
 
@@ -125,7 +138,12 @@ end
 |---|---|
 | `PCO_CLIENT_ID` | Planning Center OAuth client ID. Required for PCO sync. |
 | `PCO_CLIENT_SECRET` | Planning Center OAuth client secret. Required for PCO sync. |
-| `VITE_API_BASE_URL` | Frontend API base URL. Baked in at build time. e.g. `https://your-app.up.railway.app/api/v1` |
+| `PCO_REDIRECT_URI` | e.g. `https://your-app.up.railway.app/auth/pco/callback` |
+| `PCO_KIDS_MINISTRY_TAG` | PCO tag name to filter events. Defaults to pulling all events. |
+| `TWILIO_ACCOUNT_SID` | Twilio SID for SMS invite links. |
+| `TWILIO_AUTH_TOKEN` | Twilio auth token. |
+| `TWILIO_FROM_NUMBER` | Twilio phone number. |
+| `CORS_ORIGINS` | Allowed CORS origins. Defaults to `FRONTEND_BASE_URL`. |
 | `RAILS_LOG_LEVEL` | Defaults to `info`. |
 | `DEBUG_PCO_SYNC` | Set `true` for verbose PCO sync logs. |
 
@@ -157,14 +175,24 @@ Click **Connect PCO** — approve the PCO consent screen. kidsmin stores your ac
 
 ---
 
-## Services (Procfile)
+## Services
 
 | Service | Command |
 |---|---|
-| `web` | `bundle exec puma -C config/puma.rb` |
+| `web` | `bundle exec rails db:migrate && bundle exec puma -C config/puma.rb` |
 | `worker` | `bundle exec sidekiq` |
 
-On Railway, deploy `worker` as a separate service with start command overridden to `bundle exec sidekiq`.
+### Railway worker service setup
+
+Railway runs one process per service. Sidekiq needs its own service:
+
+1. In your Railway project, click **+ New → GitHub Repo** → select this same repo
+2. Name it `worker`
+3. Override **Start Command** to: `bundle exec sidekiq`
+4. Override **Build Command** to: `bundle install`
+5. Share the same `DATABASE_URL` and `REDIS_URL` environment variables from the PostgreSQL and Redis plugins
+
+Without the worker service, background PCO sync jobs will not run. The web app still functions — sync must be triggered manually via the admin panel.
 
 ---
 

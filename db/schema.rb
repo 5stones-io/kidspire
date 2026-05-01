@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_04_28_000013) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_28_000014) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -152,6 +152,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_28_000013) do
     t.datetime "last_synced_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "pco_kids_ministry_tag"
+    t.boolean "auto_sync_enabled", default: false, null: false
   end
 
   add_foreign_key "account_email_auth_keys", "accounts", column: "id"

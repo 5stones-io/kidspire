@@ -1,9 +1,9 @@
 [build]
 builder = "nixpacks"
-buildCommand = "bundle install && bun install && bun run build && bundle exec rails db:migrate"
+buildCommand = "bundle install && bun install && bun run build"
 
 [deploy]
-startCommand        = "bundle exec puma -C config/puma.rb"
+startCommand        = "bundle exec rails db:migrate && bundle exec puma -C config/puma.rb"
 healthcheckPath     = "/up"
 healthcheckTimeout  = 60
 restartPolicyType   = "on_failure"
