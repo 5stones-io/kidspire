@@ -5,6 +5,7 @@ RUN apt-get update -qq && apt-get install -y \
     libpq-dev \
     curl \
     git \
+    unzip \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Bun
