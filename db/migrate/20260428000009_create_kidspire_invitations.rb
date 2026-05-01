@@ -1,8 +1,8 @@
-class CreateKidsminInvitations < ActiveRecord::Migration[7.2]
+class CreateKidspireInvitations < ActiveRecord::Migration[7.2]
   def change
-    create_table :kidsmin_invitations do |t|
+    create_table :kidspire_invitations do |t|
       t.references :family, null: false,
-                             foreign_key: { to_table: :kidsmin_families },
+                             foreign_key: { to_table: :kidspire_families },
                              index: true
       t.string   :token,       null: false
       t.datetime :expires_at,  null: false
@@ -11,6 +11,6 @@ class CreateKidsminInvitations < ActiveRecord::Migration[7.2]
       t.timestamps
     end
 
-    add_index :kidsmin_invitations, :token, unique: true
+    add_index :kidspire_invitations, :token, unique: true
   end
 end

@@ -1,6 +1,6 @@
-class CreateKidsminEvents < ActiveRecord::Migration[7.2]
+class CreateKidspireEvents < ActiveRecord::Migration[7.2]
   def change
-    create_table :kidsmin_events do |t|
+    create_table :kidspire_events do |t|
       t.string   :title,       null: false
       t.text     :description
       t.datetime :event_date,  null: false
@@ -14,7 +14,7 @@ class CreateKidsminEvents < ActiveRecord::Migration[7.2]
       t.timestamps
     end
 
-    add_index :kidsmin_events, :event_date
-    add_index :kidsmin_events, :pco_event_id, unique: true, where: "pco_event_id IS NOT NULL"
+    add_index :kidspire_events, :event_date
+    add_index :kidspire_events, :pco_event_id, unique: true, where: "pco_event_id IS NOT NULL"
   end
 end

@@ -1,6 +1,6 @@
-class CreateKidsminChurchIntegrations < ActiveRecord::Migration[7.2]
+class CreateKidspireChurchIntegrations < ActiveRecord::Migration[7.2]
   def change
-    create_table :kidsmin_church_integrations do |t|
+    create_table :kidspire_church_integrations do |t|
       t.string   :token_type,    null: false  # "personal" | "oauth"
       t.text     :access_token               # AES-256-GCM encrypted
       t.text     :refresh_token              # AES-256-GCM encrypted

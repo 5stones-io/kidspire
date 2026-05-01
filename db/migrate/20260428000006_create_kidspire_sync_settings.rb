@@ -1,6 +1,6 @@
-class CreateKidsminSyncSettings < ActiveRecord::Migration[7.2]
+class CreateKidspireSyncSettings < ActiveRecord::Migration[7.2]
   def change
-    create_table :kidsmin_sync_settings do |t|
+    create_table :kidspire_sync_settings do |t|
       t.boolean  :inbound_people_sync,          null: false, default: true
       t.boolean  :outbound_people_sync,         null: false, default: false
       t.boolean  :inbound_events_sync,          null: false, default: true

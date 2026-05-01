@@ -1,6 +1,6 @@
-class CreateKidsminFamilies < ActiveRecord::Migration[7.2]
+class CreateKidspireFamilies < ActiveRecord::Migration[7.2]
   def change
-    create_table :kidsmin_families do |t|
+    create_table :kidspire_families do |t|
       t.string   :supabase_uid,           null: false
       t.string   :family_name
       t.string   :primary_contact_name
@@ -14,9 +14,9 @@ class CreateKidsminFamilies < ActiveRecord::Migration[7.2]
       t.timestamps
     end
 
-    add_index :kidsmin_families, :supabase_uid, unique: true
-    add_index :kidsmin_families, :email
-    add_index :kidsmin_families, :pco_person_id
-    add_index :kidsmin_families, :pco_household_id
+    add_index :kidspire_families, :supabase_uid, unique: true
+    add_index :kidspire_families, :email
+    add_index :kidspire_families, :pco_person_id
+    add_index :kidspire_families, :pco_household_id
   end
 end
