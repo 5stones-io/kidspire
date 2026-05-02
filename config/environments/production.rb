@@ -40,13 +40,15 @@ Rails.application.configure do
   # Use SECRET_KEY_BASE env var directly (Railway sets this; no credentials file needed).
   config.secret_key_base = ENV["SECRET_KEY_BASE"]
 
-  # Allow Railway domain + any custom domain set via env var
+  # Allow Railway domains + custom domain + internal healthcheck hosts
   config.hosts = [
     ENV["RAILWAY_PUBLIC_DOMAIN"],
     ENV["RAILWAY_STATIC_URL"],
     ENV["CUSTOM_DOMAIN"],
-  ].compact.map { |h| h.sub(/^https?:\/\//, "") }
+    "localhost",
+    /\A[\d.]+\z/,       # IPv4 (Railway internal healthcheck)
+    /\A[[\da-f:]+]\z/,  # IPv6
+  ].compact.map { |h| h.is_a?(String) ? h.sub(/^https?:\/\//, "") : h }
 
-  # If no hosts configured (e.g. first boot), allow all — admins should set CUSTOM_DOMAIN
-  config.hosts = nil if config.hosts.empty?
+  config.hosts = nil if config.hosts.select { |h| h.is_a?(String) }.empty?
 end
