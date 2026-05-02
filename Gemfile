@@ -15,6 +15,7 @@ gem "connection_pool", "~> 2.0"               # 3.x breaks Ruby 3.3
 gem "redis",          "~> 5.0"
 gem "rack-cors"
 gem "rack-attack"
+gem "resend"
 
 gem "bootsnap", require: false
 gem "dotenv-rails", groups: [:development, :test]

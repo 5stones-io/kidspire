@@ -18,21 +18,11 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
 
   # ── Email (magic links) ──────────────────────────────────────────────────
-  # Works with any SMTP provider: Resend, Postmark, SendGrid, etc.
-  # Resend: host=smtp.resend.com, port=465, user=resend, pass=<api-key>
-  config.action_mailer.delivery_method   = :smtp
+  # Railway blocks all outbound SMTP ports; use Resend's HTTP API instead.
+  Resend.api_key = ENV["RESEND_API_KEY"]
+  config.action_mailer.delivery_method   = :resend
   config.action_mailer.perform_deliveries = true
   config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.smtp_settings = {
-    address:              ENV.fetch("SMTP_ADDRESS",  "smtp.resend.com"),
-    port:                 ENV.fetch("SMTP_PORT",     "465").to_i,
-    user_name:            ENV.fetch("SMTP_USERNAME", "resend"),
-    password:             ENV["SMTP_PASSWORD"],
-    authentication:       :login,
-    enable_starttls_auto: ENV.fetch("SMTP_PORT", "465").to_i != 465,
-    ssl:                  ENV.fetch("SMTP_PORT", "465").to_i == 465,
-    domain:               ENV.fetch("SMTP_DOMAIN", ENV.fetch("RAILWAY_PUBLIC_DOMAIN", "localhost")),
-  }
   config.action_mailer.default_url_options = {
     host:     ENV.fetch("CUSTOM_DOMAIN", ENV.fetch("RAILWAY_PUBLIC_DOMAIN", "localhost")),
     protocol: "https",
