@@ -13,7 +13,7 @@ if Rails.env.production?
         subject: "Kidspire startup check",
         text:    "SMTP delivery check at #{Time.current}"
       })
-      $stdout.puts "[resend_check] Send OK — id=#{result['id']}"
+      $stdout.puts "[resend_check] Send OK — id=#{result[:id] || result['id']}"
     rescue => e
       $stdout.puts "[resend_check] Send FAILED — #{e.class}: #{e.message}"
     end
