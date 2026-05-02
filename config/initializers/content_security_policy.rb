@@ -1,9 +1,4 @@
 Rails.application.configure do
-  # No CSP in development — Vite HMR requires eval and inline scripts.
-  # Production CSP is handled at the infrastructure level (Railway / CDN headers).
-  next if Rails.env.development?
-
-  config.content_security_policy do |policy|
-    policy.script_src :self
-  end
+  # CSP is handled at the infrastructure level (Railway / CDN headers).
+  # Rails does not set a CSP header — doing so blocks Vite's inline scripts.
 end
