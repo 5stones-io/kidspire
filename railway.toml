@@ -6,3 +6,9 @@ healthcheckPath     = "/up"
 healthcheckTimeout  = 60
 restartPolicyType   = "on_failure"
 restartPolicyMaxRetries = 3
+
+[variables]
+SECRET_KEY_BASE  = "${{ secret(64) }}"
+ENCRYPTION_KEY   = "${{ secret(32) }}"
+RAILS_ENV        = "production"
+RAILS_LOG_LEVEL  = "info"
