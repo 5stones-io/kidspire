@@ -69,7 +69,7 @@ class RodauthMain < Rodauth::Rails::Auth
 
       if Rails.env.production?
         from = ENV["MAILER_FROM"].presence || "noreply@kidspire.app"
-        magic_link_url = link
+        @magic_link_url = link
         html = ERB.new(File.read(Rails.root.join("app/views/rodauth_mailer/email_auth.html.erb"))).result(binding)
         text = ERB.new(File.read(Rails.root.join("app/views/rodauth_mailer/email_auth.text.erb"))).result(binding)
         resp = Resend::Emails.send({
