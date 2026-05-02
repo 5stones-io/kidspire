@@ -2,6 +2,7 @@
 builder = "dockerfile"
 
 [deploy]
-startCommand        = "bundle exec sidekiq -q default -q mailers"
-restartPolicyType   = "on_failure"
+startCommand           = "bundle exec sidekiq -q default -q mailers"
+healthcheckPath        = ""
+restartPolicyType      = "on_failure"
 restartPolicyMaxRetries = 3
