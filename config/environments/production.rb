@@ -8,6 +8,7 @@ Rails.application.configure do
   # Serve static files from public/ (Vite build output lives here)
   config.public_file_server.enabled = true
 
+  config.logger     = ActiveSupport::Logger.new($stdout)
   config.log_level  = ENV.fetch("RAILS_LOG_LEVEL", "info").to_sym
   config.log_tags   = [:request_id]
   # SSL is terminated at Railway's ingress — do not force it at the app level
