@@ -1,0 +1,184 @@
+{
+  "note": "Reference for configuring the Railway template. 'source' indicates how the value is supplied.",
+  "sources": {
+    "auto":      "Railway injects this automatically — do not set manually",
+    "generated": "Railway generates a random secret at deploy time — user never touches it",
+    "shared":    "Set once at project level, referenced by both web and worker services",
+    "plugin":    "Auto-provided by the Railway Postgres or Redis plugin",
+    "prefilled": "Sensible default provided — user can override if needed",
+    "required":  "User must supply this value — no default possible",
+    "optional":  "Only needed for optional features — leave blank to skip"
+  },
+  "shared_variables": [
+    {
+      "name": "SECRET_KEY_BASE",
+      "description": "Rails encryption key. Auto-generated — never share or change after deploy.",
+      "source": "generated",
+      "default": "${{ secret(64) }}"
+    },
+    {
+      "name": "ENCRYPTION_KEY",
+      "description": "AES-256 key for encrypting Planning Center OAuth tokens.",
+      "source": "generated",
+      "default": "${{ secret(32) }}"
+    }
+  ],
+  "web": [
+    {
+      "name": "DATABASE_URL",
+      "description": "PostgreSQL connection string.",
+      "source": "plugin",
+      "default": "${{ Postgres.DATABASE_URL }}"
+    },
+    {
+      "name": "REDIS_URL",
+      "description": "Redis connection string.",
+      "source": "plugin",
+      "default": "${{ Redis.REDIS_URL }}"
+    },
+    {
+      "name": "RAILS_ENV",
+      "description": "Rails environment.",
+      "source": "prefilled",
+      "default": "production"
+    },
+    {
+      "name": "RAILS_LOG_LEVEL",
+      "description": "Log verbosity.",
+      "source": "prefilled",
+      "default": "info"
+    },
+    {
+      "name": "RESEND_API_KEY",
+      "description": "API key from resend.com. Required for magic link login emails.",
+      "source": "required",
+      "default": ""
+    },
+    {
+      "name": "MAILER_FROM",
+      "description": "Sender address for emails. Must be from a domain verified in Resend. Example: Kidspire <noreply@mail.yourdomain.com>",
+      "source": "required",
+      "default": ""
+    },
+    {
+      "name": "FRONTEND_BASE_URL",
+      "description": "Public URL of the frontend. Example: https://yourapp.up.railway.app",
+      "source": "required",
+      "default": ""
+    },
+    {
+      "name": "VITE_API_BASE_URL",
+      "description": "Public URL of the API. Example: https://yourapp.up.railway.app/api/v1",
+      "source": "required",
+      "default": ""
+    },
+    {
+      "name": "CORS_ORIGINS",
+      "description": "Allowed frontend origin for CORS. Should match FRONTEND_BASE_URL.",
+      "source": "required",
+      "default": ""
+    },
+    {
+      "name": "PCO_CLIENT_ID",
+      "description": "OAuth app client ID from api.planningcenteronline.com/oauth/applications",
+      "source": "required",
+      "default": ""
+    },
+    {
+      "name": "PCO_CLIENT_SECRET",
+      "description": "OAuth app client secret from Planning Center.",
+      "source": "required",
+      "default": ""
+    },
+    {
+      "name": "PCO_REDIRECT_URI",
+      "description": "OAuth callback URL. Must match exactly what is registered in Planning Center. Example: https://yourapp.up.railway.app/auth/pco/callback",
+      "source": "required",
+      "default": ""
+    },
+    {
+      "name": "PCO_KIDS_MINISTRY_TAG",
+      "description": "Tag name in PCO People used to identify kids ministry families.",
+      "source": "prefilled",
+      "default": "kidspire"
+    },
+    {
+      "name": "CUSTOM_DOMAIN",
+      "description": "Custom domain if you have one. Leave blank to use the Railway-provided URL.",
+      "source": "optional",
+      "default": ""
+    },
+    {
+      "name": "TWILIO_ACCOUNT_SID",
+      "description": "Twilio account SID. Only required for SMS invite links.",
+      "source": "optional",
+      "default": ""
+    },
+    {
+      "name": "TWILIO_AUTH_TOKEN",
+      "description": "Twilio auth token. Only required for SMS invite links.",
+      "source": "optional",
+      "default": ""
+    },
+    {
+      "name": "TWILIO_FROM_NUMBER",
+      "description": "Twilio phone number in E.164 format. Only required for SMS invite links.",
+      "source": "optional",
+      "default": ""
+    }
+  ],
+  "worker": [
+    {
+      "name": "DATABASE_URL",
+      "description": "PostgreSQL connection string.",
+      "source": "plugin",
+      "default": "${{ Postgres.DATABASE_URL }}"
+    },
+    {
+      "name": "REDIS_URL",
+      "description": "Redis connection string.",
+      "source": "plugin",
+      "default": "${{ Redis.REDIS_URL }}"
+    },
+    {
+      "name": "RAILS_ENV",
+      "source": "prefilled",
+      "default": "production"
+    },
+    {
+      "name": "RESEND_API_KEY",
+      "source": "shared",
+      "description": "Same value as web service — reference from shared variables."
+    },
+    {
+      "name": "MAILER_FROM",
+      "source": "shared",
+      "description": "Same value as web service — reference from shared variables."
+    },
+    {
+      "name": "PCO_CLIENT_ID",
+      "source": "shared",
+      "description": "Same value as web service — reference from shared variables."
+    },
+    {
+      "name": "PCO_CLIENT_SECRET",
+      "source": "shared",
+      "description": "Same value as web service — reference from shared variables."
+    },
+    {
+      "name": "TWILIO_ACCOUNT_SID",
+      "source": "shared",
+      "description": "Same value as web service — reference from shared variables."
+    },
+    {
+      "name": "TWILIO_AUTH_TOKEN",
+      "source": "shared",
+      "description": "Same value as web service — reference from shared variables."
+    },
+    {
+      "name": "TWILIO_FROM_NUMBER",
+      "source": "shared",
+      "description": "Same value as web service — reference from shared variables."
+    }
+  ]
+}
