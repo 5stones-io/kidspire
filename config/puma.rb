@@ -6,7 +6,5 @@ port ENV.fetch("PORT", 3000)
 
 environment ENV.fetch("RAILS_ENV", "development")
 
-if ENV.fetch("RAILS_ENV", "development") == "production"
-  workers ENV.fetch("WEB_CONCURRENCY", 2)
-  preload_app!
-end
+workers ENV.fetch("WEB_CONCURRENCY", 0)
+preload_app! if ENV.fetch("WEB_CONCURRENCY", "0").to_i > 0
