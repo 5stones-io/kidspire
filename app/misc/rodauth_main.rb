@@ -64,7 +64,7 @@ class RodauthMain < Rodauth::Rails::Auth
              "?key=#{CGI.escape(full_token)}" \
              "&email=#{CGI.escape(email)}"
       Rails.logger.warn("\n\n🔐 [kidspire] Magic link for #{email}:\n#{link}\n\n")
-      RodauthMailer.email_auth(email, link).deliver_later
+      RodauthMailer.email_auth(email, link).deliver_now
     end
 
     # No resend cooldown in development.
