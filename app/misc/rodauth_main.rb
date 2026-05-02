@@ -66,17 +66,9 @@ class RodauthMain < Rodauth::Rails::Auth
       Rails.logger.warn("\n\n🔐 [kidspire] Magic link for #{email}:\n#{link}\n\n")
 
       from = ENV["MAILER_FROM"].presence || "noreply@kidspire.app"
-      html = ApplicationController.renderer.render(
-        template: "rodauth_mailer/email_auth",
-        assigns: { magic_link_url: link },
-        layout: false
-      )
-      text = ApplicationController.renderer.render(
-        template: "rodauth_mailer/email_auth",
-        formats: [:text],
-        assigns: { magic_link_url: link },
-        layout: false
-      )
+      magic_link_url = link
+      html = ERB.new(File.read(Rails.root.join("app/views/rodauth_mailer/email_auth.html.erb"))).result(binding)
+      text = ERB.new(File.read(Rails.root.join("app/views/rodauth_mailer/email_auth.text.erb"))).result(binding)
       resp = Resend::Emails.send({
         from:    from,
         to:      [email],
