@@ -64,7 +64,27 @@ class RodauthMain < Rodauth::Rails::Auth
              "?key=#{CGI.escape(full_token)}" \
              "&email=#{CGI.escape(email)}"
       Rails.logger.warn("\n\n🔐 [kidspire] Magic link for #{email}:\n#{link}\n\n")
-      RodauthMailer.email_auth(email, link).deliver_now
+
+      from = ENV["MAILER_FROM"].presence || "noreply@kidspire.app"
+      html = ApplicationController.renderer.render(
+        template: "rodauth_mailer/email_auth",
+        assigns: { magic_link_url: link },
+        layout: false
+      )
+      text = ApplicationController.renderer.render(
+        template: "rodauth_mailer/email_auth",
+        formats: [:text],
+        assigns: { magic_link_url: link },
+        layout: false
+      )
+      resp = Resend::Emails.send({
+        from:    from,
+        to:      [email],
+        subject: "Your kidspire sign-in link",
+        html:    html,
+        text:    text
+      })
+      Rails.logger.warn("[resend] magic link send result: #{resp.inspect}")
     end
 
     # No resend cooldown in development.
