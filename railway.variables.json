@@ -37,6 +37,10 @@
       "value": "",
       "description": "REQUIRED. Sender address — must be from a verified Resend domain. Example: Kidspire <noreply@mail.yourdomain.com>"
     },
+    "MAILER_CHECK_TO": {
+      "value": "",
+      "description": "OPTIONAL. Real email address to receive the startup delivery check. Leave blank to use Resend's test sink (delivered@resend.dev)."
+    },
     "FRONTEND_BASE_URL": {
       "value": "",
       "description": "REQUIRED. Public URL of the app. Example: https://yourapp.up.railway.app"
