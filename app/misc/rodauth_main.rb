@@ -60,23 +60,27 @@ class RodauthMain < Rodauth::Rails::Auth
     send_email_auth_email do
       email      = account[login_column]
       full_token = "#{account_id}#{token_separator}#{email_auth_key_value}"
-      link = "#{Kidspire.configuration.frontend_base_url}/auth/callback" \
+      base = Kidspire.configuration.frontend_base_url.presence ||
+               ENV.fetch("RAILWAY_PUBLIC_DOMAIN") { raise "FRONTEND_BASE_URL is not set" }.then { |d| "https://#{d}" }
+      link = "#{base}/auth/callback" \
              "?key=#{CGI.escape(full_token)}" \
              "&email=#{CGI.escape(email)}"
       Rails.logger.warn("\n\n🔐 [kidspire] Magic link for #{email}:\n#{link}\n\n")
 
-      from = ENV["MAILER_FROM"].presence || "noreply@kidspire.app"
-      magic_link_url = link
-      html = ERB.new(File.read(Rails.root.join("app/views/rodauth_mailer/email_auth.html.erb"))).result(binding)
-      text = ERB.new(File.read(Rails.root.join("app/views/rodauth_mailer/email_auth.text.erb"))).result(binding)
-      resp = Resend::Emails.send({
-        from:    from,
-        to:      [email],
-        subject: "Your kidspire sign-in link",
-        html:    html,
-        text:    text
-      })
-      Rails.logger.warn("[resend] magic link send result: #{resp.inspect}")
+      if Rails.env.production?
+        from = ENV["MAILER_FROM"].presence || "noreply@kidspire.app"
+        magic_link_url = link
+        html = ERB.new(File.read(Rails.root.join("app/views/rodauth_mailer/email_auth.html.erb"))).result(binding)
+        text = ERB.new(File.read(Rails.root.join("app/views/rodauth_mailer/email_auth.text.erb"))).result(binding)
+        resp = Resend::Emails.send({
+          from:    from,
+          to:      [email],
+          subject: "Your kidspire sign-in link",
+          html:    html,
+          text:    text
+        })
+        Rails.logger.warn("[resend] magic link send result: #{resp.inspect}")
+      end
     end
 
     # No resend cooldown in development.
