@@ -3,16 +3,23 @@ import { Link } from "react-router-dom"
 import { api } from "@/lib/api"
 
 // ── Types ────────────────────────────────────────────────────────────────────
+// Split to match the backend split: identity/people-sync settings live in
+// spirely (/sync_settings), ministry/events+registrations settings live in
+// kidspire's own narrowed copy (/ministry_sync_settings).
 
-interface SyncSettings {
-  inbound_people_sync:         boolean
+interface IdentitySyncSettings {
+  inbound_people_sync:  boolean
+  outbound_people_sync: boolean
+  sync_frequency_hours: number
+  conflict_resolution:  string
+  auto_sync_enabled:    boolean
+  pco_ministry_tag:     string | null
+  last_synced_at:       string | null
+}
+
+interface MinistrySyncSettings {
   inbound_events_sync:         boolean
-  outbound_people_sync:        boolean
   outbound_registrations_sync: boolean
-  sync_frequency_hours:        number
-  conflict_resolution:         string
-  auto_sync_enabled:           boolean
-  pco_kids_ministry_tag:       string | null
   last_synced_at:              string | null
 }
 
@@ -48,7 +55,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function AdminSettings() {
-  const [settings, setSettings]   = useState<SyncSettings | null>(null)
+  const [identity, setIdentity]   = useState<IdentitySyncSettings | null>(null)
+  const [ministry, setMinistry]   = useState<MinistrySyncSettings | null>(null)
   const [saving, setSaving]       = useState(false)
   const [saved, setSaved]         = useState(false)
   const [syncing, setSyncing]     = useState(false)
@@ -56,35 +64,47 @@ export default function AdminSettings() {
   const [pcoConnected, setPcoConnected] = useState<boolean | null>(null)
 
   useEffect(() => {
-    api.get<SyncSettings>("/sync_settings").then(setSettings)
+    api.get<IdentitySyncSettings>("/sync_settings").then(setIdentity)
+    api.get<MinistrySyncSettings>("/ministry_sync_settings").then(setMinistry)
     // Check PCO connection by trying to read the church integration
     api.get<{ connected: boolean }>("/admin/pco_status")
       .then(r => setPcoConnected(r.connected))
       .catch(() => setPcoConnected(false))
   }, [])
 
-  function update<K extends keyof SyncSettings>(key: K, value: SyncSettings[K]) {
-    setSettings(prev => prev ? { ...prev, [key]: value } : prev)
+  function updateIdentity<K extends keyof IdentitySyncSettings>(key: K, value: IdentitySyncSettings[K]) {
+    setIdentity(prev => prev ? { ...prev, [key]: value } : prev)
+  }
+
+  function updateMinistry<K extends keyof MinistrySyncSettings>(key: K, value: MinistrySyncSettings[K]) {
+    setMinistry(prev => prev ? { ...prev, [key]: value } : prev)
   }
 
   async function save() {
-    if (!settings) return
+    if (!identity || !ministry) return
     setSaving(true)
     setSaved(false)
     try {
-      const updated = await api.patch<SyncSettings>("/sync_settings", {
-        sync_setting: {
-          inbound_people_sync:         settings.inbound_people_sync,
-          inbound_events_sync:         settings.inbound_events_sync,
-          outbound_people_sync:        settings.outbound_people_sync,
-          outbound_registrations_sync: settings.outbound_registrations_sync,
-          sync_frequency_hours:        settings.sync_frequency_hours,
-          conflict_resolution:         settings.conflict_resolution,
-          auto_sync_enabled:           settings.auto_sync_enabled,
-          pco_kids_ministry_tag:       settings.pco_kids_ministry_tag || null,
-        }
-      })
-      setSettings(updated)
+      const [updatedIdentity, updatedMinistry] = await Promise.all([
+        api.patch<IdentitySyncSettings>("/sync_settings", {
+          sync_setting: {
+            inbound_people_sync:  identity.inbound_people_sync,
+            outbound_people_sync: identity.outbound_people_sync,
+            sync_frequency_hours: identity.sync_frequency_hours,
+            conflict_resolution:  identity.conflict_resolution,
+            auto_sync_enabled:    identity.auto_sync_enabled,
+            pco_ministry_tag:     identity.pco_ministry_tag || null,
+          }
+        }),
+        api.patch<MinistrySyncSettings>("/ministry_sync_settings", {
+          sync_setting: {
+            inbound_events_sync:         ministry.inbound_events_sync,
+            outbound_registrations_sync: ministry.outbound_registrations_sync,
+          }
+        }),
+      ])
+      setIdentity(updatedIdentity)
+      setMinistry(updatedMinistry)
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } finally {
@@ -96,21 +116,24 @@ export default function AdminSettings() {
     setSyncing(true)
     setSyncResult(null)
     try {
-      const res = await api.post<{ enqueued: string[] }>("/sync/trigger", {})
-      setSyncResult(`Queued: ${res.enqueued.join(", ")}`)
+      const [people, events] = await Promise.all([
+        api.post<{ enqueued: string[] }>("/sync/trigger", {}),
+        api.post<{ enqueued: string[] }>("/ministry/sync/trigger", {}),
+      ])
+      setSyncResult(`Queued: ${[...people.enqueued, ...events.enqueued].join(", ")}`)
     } finally {
       setSyncing(false)
     }
   }
 
-  if (!settings) return (
+  if (!identity || !ministry) return (
     <div className="min-h-screen bg-background flex items-center justify-center">
       <p className="text-muted-foreground">Loading…</p>
     </div>
   )
 
-  const nextSync = settings.auto_sync_enabled && settings.last_synced_at
-    ? new Date(new Date(settings.last_synced_at).getTime() + settings.sync_frequency_hours * 3600000)
+  const nextSync = identity.auto_sync_enabled && identity.last_synced_at
+    ? new Date(new Date(identity.last_synced_at).getTime() + identity.sync_frequency_hours * 3600000)
     : null
 
   return (
@@ -157,19 +180,19 @@ export default function AdminSettings() {
           </div>
         </Section>
 
-        {/* Import settings */}
-        <Section title="Import settings">
+        {/* Import settings — families/children (spirely) */}
+        <Section title="Family import settings">
           <div className="mb-5">
-            <label className="text-sm font-semibold">Kids ministry tag</label>
+            <label className="text-sm font-semibold">Ministry tag</label>
             <p className="text-xs text-muted-foreground mt-0.5 mb-2">
               Only import PCO families tagged with this name. Leave blank to import everyone.
               Create the tag in PCO → People → More → Tags.
             </p>
             <input
               type="text"
-              value={settings.pco_kids_ministry_tag ?? ""}
-              onChange={e => update("pco_kids_ministry_tag", e.target.value || null)}
-              placeholder="kidspire"
+              value={identity.pco_ministry_tag ?? ""}
+              onChange={e => updateIdentity("pco_ministry_tag", e.target.value || null)}
+              placeholder="spirely"
               className="h-11 w-full max-w-xs rounded-xl border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
@@ -177,61 +200,70 @@ export default function AdminSettings() {
           <div className="mb-5">
             <label className="text-sm font-semibold">Conflict resolution</label>
             <p className="text-xs text-muted-foreground mt-0.5 mb-2">
-              When a family exists in both kidspire and PCO with different data, which wins?
+              When a family exists in both spirely and PCO with different data, which wins?
             </p>
             <select
-              value={settings.conflict_resolution}
-              onChange={e => update("conflict_resolution", e.target.value)}
+              value={identity.conflict_resolution}
+              onChange={e => updateIdentity("conflict_resolution", e.target.value)}
               className="h-11 w-full max-w-xs rounded-xl border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             >
               <option value="pco_wins">PCO always wins</option>
-              <option value="kidspire_wins">kidspire always wins</option>
+              <option value="local_wins">spirely always wins</option>
               <option value="newest_wins">Most recently updated wins</option>
             </select>
           </div>
 
           <Toggle
             label="Import families from PCO"
-            desc="Sync people and households into kidspire families"
-            checked={settings.inbound_people_sync}
-            onChange={v => update("inbound_people_sync", v)}
-          />
-          <Toggle
-            label="Import events from PCO"
-            desc="Sync upcoming Calendar and Check-Ins events"
-            checked={settings.inbound_events_sync}
-            onChange={v => update("inbound_events_sync", v)}
+            desc="Sync people and households into family profiles"
+            checked={identity.inbound_people_sync}
+            onChange={v => updateIdentity("inbound_people_sync", v)}
           />
           <Toggle
             label="Push profile updates to PCO"
-            desc="When a family edits their profile in kidspire, update PCO"
-            checked={settings.outbound_people_sync}
-            onChange={v => update("outbound_people_sync", v)}
+            desc="When a family edits their profile, update PCO"
+            checked={identity.outbound_people_sync}
+            onChange={v => updateIdentity("outbound_people_sync", v)}
+          />
+        </Section>
+
+        {/* Import settings — events/registrations (kidspire) */}
+        <Section title="Ministry import settings">
+          <Toggle
+            label="Import events from PCO"
+            desc="Sync upcoming Calendar and Check-Ins events"
+            checked={ministry.inbound_events_sync}
+            onChange={v => updateMinistry("inbound_events_sync", v)}
           />
           <Toggle
             label="Push registrations to PCO"
             desc="Sync event registrations back to PCO Check-Ins"
-            checked={settings.outbound_registrations_sync}
-            onChange={v => update("outbound_registrations_sync", v)}
+            checked={ministry.outbound_registrations_sync}
+            onChange={v => updateMinistry("outbound_registrations_sync", v)}
           />
+          {ministry.last_synced_at && (
+            <p className="mt-4 text-xs text-muted-foreground">
+              Last ministry sync: {new Date(ministry.last_synced_at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}
+            </p>
+          )}
         </Section>
 
-        {/* Automatic sync */}
+        {/* Automatic sync — identity-only; ministry sync is manual-trigger only */}
         <Section title="Automatic sync">
           <Toggle
             label="Enable automatic sync"
             desc="Runs in the background on the interval below. Requires Sidekiq worker to be running."
-            checked={settings.auto_sync_enabled}
-            onChange={v => update("auto_sync_enabled", v)}
+            checked={identity.auto_sync_enabled}
+            onChange={v => updateIdentity("auto_sync_enabled", v)}
           />
 
           <div className="mt-5">
             <label className="text-sm font-semibold">Sync frequency</label>
             <p className="text-xs text-muted-foreground mt-0.5 mb-2">How often to run the automatic import.</p>
             <select
-              value={settings.sync_frequency_hours}
-              onChange={e => update("sync_frequency_hours", Number(e.target.value))}
-              disabled={!settings.auto_sync_enabled}
+              value={identity.sync_frequency_hours}
+              onChange={e => updateIdentity("sync_frequency_hours", Number(e.target.value))}
+              disabled={!identity.auto_sync_enabled}
               className="h-11 w-full max-w-xs rounded-xl border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
             >
               <option value={1}>Every hour</option>
@@ -242,15 +274,15 @@ export default function AdminSettings() {
             </select>
           </div>
 
-          {(settings.last_synced_at || nextSync) && (
+          {(identity.last_synced_at || nextSync) && (
             <div className="mt-4 rounded-2xl bg-secondary/60 p-4 text-sm space-y-1">
-              {settings.last_synced_at && (
+              {identity.last_synced_at && (
                 <p>
                   <span className="text-muted-foreground">Last sync: </span>
-                  {new Date(settings.last_synced_at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}
+                  {new Date(identity.last_synced_at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}
                 </p>
               )}
-              {nextSync && settings.auto_sync_enabled && (
+              {nextSync && identity.auto_sync_enabled && (
                 <p>
                   <span className="text-muted-foreground">Next sync: </span>
                   {nextSync.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}
@@ -264,7 +296,7 @@ export default function AdminSettings() {
         <Section title="Manual import">
           <p className="text-sm text-muted-foreground mb-4">
             Trigger an immediate import from PCO regardless of the automatic schedule.
-            Jobs run in the background — check the admin dashboard for updated family counts.
+            Jobs run in the background — check the admin dashboard for updated counts.
           </p>
           <div className="flex items-center gap-4 flex-wrap">
             <button
@@ -277,16 +309,6 @@ export default function AdminSettings() {
             {syncResult && (
               <p className="text-sm text-green-700 font-medium">✓ {syncResult}</p>
             )}
-          </div>
-
-          <div className="mt-5 rounded-2xl bg-amber-50 border border-amber-200 p-4">
-            <p className="text-sm font-semibold text-amber-800">First time importing?</p>
-            <p className="text-xs text-amber-700 mt-1">
-              Run this from your server or Railway shell to auto-tag all PCO households that have children:
-            </p>
-            <code className="mt-2 block rounded-lg bg-white px-3 py-2 text-xs text-amber-900">
-              bundle exec rails pco:tag_families_with_children APPLY=true
-            </code>
           </div>
         </Section>
 

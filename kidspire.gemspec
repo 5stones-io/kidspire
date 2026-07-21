@@ -31,9 +31,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "rails",         "~> 7.2"
   spec.add_dependency "pg",           "~> 1.5"
-  spec.add_dependency "rodauth-rails", "~> 1.0"
-  spec.add_dependency "jwt"
-  spec.add_dependency "bcrypt",        "~> 3.1"
+  spec.add_dependency "spirely"
   spec.add_dependency "blueprinter"
   spec.add_dependency "sidekiq",     "~> 7.0"
   spec.add_dependency "redis",      "~> 5.0"

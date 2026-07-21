@@ -3,7 +3,7 @@ module Kidspire
     def perform
       return unless SyncSetting.current.inbound_events_sync?
 
-      client = PcoClient.new
+      client = Spirely::PcoClient.new
       sync_calendar_events(client)
       sync_checkins_events(client)
 
@@ -60,7 +60,7 @@ module Kidspire
     end
 
     def ministry_tag
-      SyncSetting.current.effective_ministry_tag
+      Spirely::SyncSetting.current.effective_ministry_tag
     end
 
     def tag_id(client)

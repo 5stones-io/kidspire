@@ -2,6 +2,9 @@ require "spec_helper"
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rspec/rails"
+require "webmock/rspec"
+
+WebMock.disable_net_connect!(allow_localhost: true)
 
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 

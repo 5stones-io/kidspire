@@ -9,6 +9,6 @@ module Kidspire
     field :child_id
 
     association :event, blueprint: EventBlueprint
-    association :child, blueprint: ChildBlueprint
+    association :child, blueprint: Spirely::ChildBlueprint
   end
 end

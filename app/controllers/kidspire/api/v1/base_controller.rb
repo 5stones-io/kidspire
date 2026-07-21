@@ -14,7 +14,7 @@ module Kidspire
           # In Rodauth JWT mode, @account is not loaded for incoming API requests —
           # only the JWT session payload is decoded. Read account_id from the session.
           acct_id = rodauth.session[rodauth.session_key]
-          @current_family = Family.find_by(account_id: acct_id)
+          @current_family = Spirely::Family.find_by(account_id: acct_id)
         end
 
         def current_family = @current_family

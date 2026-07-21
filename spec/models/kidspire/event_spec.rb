@@ -61,7 +61,7 @@ RSpec.describe Kidspire::Event, type: :model do
   end
 
   describe "#age_eligible?" do
-    let(:child) { build(:kidspire_child, birthdate: 8.years.ago.to_date) }
+    let(:child) { build(:spirely_child, birthdate: 8.years.ago.to_date) }
 
     it "returns true when no age range is set" do
       expect(build(:kidspire_event).age_eligible?(child)).to be true

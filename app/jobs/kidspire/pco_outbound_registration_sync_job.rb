@@ -18,7 +18,7 @@ module Kidspire
         return
       end
 
-      client = PcoClient.new
+      client = Spirely::PcoClient.new
 
       if event.pco_source == "check_ins"
         sync_as_checkin(client, registration, child, event)

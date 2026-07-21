@@ -5,13 +5,21 @@ import { ButtonLink } from "@/components/ui/Button"
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
-interface Stats {
-  families:      { total: number; active: number; pending: number }
-  children:      number
+// Identity stats (families/children/invitations) come from spirely's mounted
+// /admin/stats; ministry stats (events/registrations) come from kidspire's
+// own /admin/ministry_stats — merged client-side into one shape.
+interface IdentityStats {
+  families:    { total: number; active: number; pending: number }
+  children:    number
+  invitations: { pending: number }
+}
+
+interface MinistryStats {
   events:        { upcoming: number; total: number }
-  invitations:   { pending: number }
   registrations: { this_month: number }
 }
+
+type Stats = IdentityStats & MinistryStats
 
 interface FamilyRow {
   id: number
@@ -295,10 +303,11 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     Promise.all([
-      api.get<Stats>("/admin/stats"),
+      api.get<IdentityStats>("/admin/stats"),
+      api.get<MinistryStats>("/admin/ministry_stats"),
       api.get<{ families: FamilyRow[] }>("/admin/families"),
-    ]).then(([s, f]) => {
-      setStats(s)
+    ]).then(([identity, ministry, f]) => {
+      setStats({ ...identity, ...ministry })
       setFamilies(f.families)
     }).finally(() => setLoading(false))
   }, [])
@@ -307,8 +316,14 @@ export default function AdminDashboard() {
     setSyncing(true)
     setSyncResult(null)
     try {
-      const res = await api.post<{ enqueued: string[]; timestamp: string }>("/sync/trigger", {})
-      setSyncResult(res)
+      const [people, ministry] = await Promise.all([
+        api.post<{ enqueued: string[]; timestamp: string }>("/sync/trigger", {}),
+        api.post<{ enqueued: string[]; timestamp: string }>("/ministry/sync/trigger", {}),
+      ])
+      setSyncResult({
+        enqueued: [...people.enqueued, ...ministry.enqueued],
+        timestamp: ministry.timestamp,
+      })
     } finally {
       setSyncing(false)
     }

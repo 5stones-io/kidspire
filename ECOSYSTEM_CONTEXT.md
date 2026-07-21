@@ -6,20 +6,34 @@ When working in any repo in this family, read this file first, then the repo-spe
 
 ---
 
-## The Four Repos
+## The Repos
+
+> **Product model is being redesigned — see `SPIRELY_CONTEXT.md` for the full draft.** Summary:
+> **Spirely** is becoming the flagship 5stones.io product — source of truth for profiles
+> (accounts, families, guardians, children, invitations) and metadata (ChMS/PCO config). **Inspire**
+> is not a separate codebase but the name for the category of ministry-specific frontend/brochure
+> products built as **Spirely core + a ministry module** — `kidspire` = Spirely + kidsmin module,
+> with `youthspire`/`seniorspire` (youthmin/seniormin modules) planned. **churchcred** is a
+> separate, standalone-capable product, *compatible with* Spirely (can read it for shared identity
+> when co-deployed) but not dependent on it and not an Inspire "module."
+> **None of this has been built yet** — as of this writing, the `kidspire` repo still owns
+> `Account`/`Family`/`Child`/`Guardian`/`Invitation`, its own Rodauth config, and its own PCO sync
+> directly; nothing has been extracted into a separate Spirely repo. Table below reflects
+> *current* reality, not the target state.
 
 | Repo | Type | Auth | PCO | Deploy |
 |---|---|---|---|---|
-| `churchcred` | Rails Engine gem · MIT · standalone | Own (Supabase Auth) | Own PCO app per church | Railway |
-| `kidspire` | Rails Engine gem · MIT · standalone | Supabase Auth | Own PCO app per church | Railway |
-| `kidsmin-cloud` | SaaS platform · Next.js | Clerk | Platform PCO OAuth app | Vercel + Railway |
+| `kidspire` | Rails Engine gem · MIT · standalone (current: bundles identity + kids-ministry frontend, pre-split) | Own Rodauth (target: delegates to spirely core) | Own PCO app per church | Railway |
+| `churchcred` | Rails Engine gem · MIT · standalone | Own (was: Supabase Auth — confirm current state before relying on this) | Own PCO app per church | Railway |
+| `spirely` | Rails Engine gem (proposed, not yet created) · MIT · flagship profile/metadata product | Rodauth (owns it) | Owns ChMS/PCO config, pending open question in `SPIRELY_CONTEXT.md` | Railway |
+| `kidsmin-cloud` | SaaS platform · Next.js (current stack — likely absorbed into Spirely-cloud, see `SPIRELY_CONTEXT.md`) | Clerk | Platform PCO OAuth app | Vercel + Railway |
 | `churchcred-cloud` | SaaS app · Rails + React | Clerk (via kidsmin-cloud JWT) | Platform PCO OAuth app | Railway |
 
 ### Standalone vs cloud
 
-The standalone gems (`churchcred`, `kidspire`) are fully self-contained. A church can deploy either gem independently with zero dependency on the platform or each other. They are MIT licensed and Railway-deployable via template.
+The standalone gems are fully self-contained. A church can deploy them independently with zero dependency on the platform. They are MIT licensed and Railway-deployable via template. Per the company mission, the self-hosted line — including self-hosted Spirely — must remain a fully complete product on its own, not a stripped-down version of the cloud offering.
 
-The cloud apps (`kidsmin-cloud`, `churchcred-cloud`) are the hosted SaaS layer. They use the gem logic as their core and add Clerk SSO, multi-tenancy, and platform-level PCO OAuth on top.
+The cloud apps are the hosted SaaS layer. Whether "kidsmin-cloud" survives as a distinct app or collapses into "Spirely-cloud with the kidsmin module enabled" is an open decision — see `SPIRELY_CONTEXT.md`. churchcred-cloud is expected to stay separate either way, mirroring churchcred's standalone "compatible, not dependent" relationship to Spirely.
 
 **Never add cloud dependencies (Clerk, kidsmin-cloud, multi-tenancy) to the standalone gems.**
 
@@ -27,7 +41,7 @@ The cloud apps (`kidsmin-cloud`, `churchcred-cloud`) are the hosted SaaS layer. 
 
 ## Shared Tech Decisions
 
-These decisions apply across all four repos unless a repo-specific doc explicitly overrides them.
+These decisions apply across all repos in the family unless a repo-specific doc explicitly overrides them.
 
 ### Backend
 - Ruby on Rails (latest stable — check `.ruby-version` in `churchcred` for the current version)
@@ -50,7 +64,7 @@ These decisions apply across all four repos unless a repo-specific doc explicitl
 - Typography: friendly, readable, not corporate
 - Tone: warm, faith-forward, built for families — not enterprise SaaS
 
-All four repos should feel like they came from the same family visually. A parent using kidspire on Sunday and churchcred on Wednesday should see the same design language.
+All repos should feel like they came from the same family visually. A parent using kidspire on Sunday and churchcred on Wednesday should see the same design language.
 
 ### API conventions
 - JSON API, versioned under `/api/v1/`
@@ -217,11 +231,17 @@ bonus     → one-off admin award
 
 ## Auth Patterns
 
-### Standalone gems (Supabase Auth)
-- Supabase Auth issues JWTs
-- Rails API validates JWT on every request using Supabase JWT secret
-- Frontend uses Supabase JS client for session management
-- Login methods: email magic link, Google OAuth, Apple OAuth
+### Standalone gems (spirely — target state)
+- spirely issues JWTs via Rodauth (passwordless email magic link)
+- Inspire modules (kidsmin, etc.) validate the JWT and read profile data from spirely core — they're
+  the same app/deploy as spirely, not a separate consumer (see `SPIRELY_CONTEXT.md`)
+- churchcred, being separate/compatible rather than a module, would validate spirely's JWT and call
+  its API like an external consumer if integration is enabled — it does not require spirely to run
+- See `SPIRELY_CONTEXT.md` for the in-process vs. networked integration decision (still open)
+- **Current state:** kidspire has not yet been split — it still runs its own Rodauth instance
+  directly (`app/misc/rodauth_main.rb`, `Account`/`Family`/`Child` models) rather than delegating
+  to spirely. Treat any mention of Supabase Auth in older docs as stale; it was replaced by Rodauth
+  before spirely was proposed.
 
 ### Cloud apps (Clerk)
 - Clerk issues JWTs
@@ -234,21 +254,46 @@ bonus     → one-off admin award
 
 ## Repo Relationships Diagram
 
+**Target state (proposed, not built — see `SPIRELY_CONTEXT.md`):**
+
 ```
+spirely (flagship product, proposed repo)
+  └── core: owns accounts, families, children, guardians, invitations (profiles)
+  └── core: owns ChMS/PCO connection + sync config (metadata) — pending open question
+  └── Rodauth-issued JWTs
+  └── self-hosted (MIT gem) + cloud (Spirely-cloud, multi-tenant)
+
+Inspire products = spirely core + a ministry module, e.g.:
+  kidspire   = spirely + kidsmin module   (children's ministry frontend/brochure site)
+  youthspire = spirely + youthmin module  (future)
+  seniorspire = spirely + seniormin module (future)
+  └── module = ministry-specific frontend: event listings, registration, themeable public site
+  └── module filters spirely's synced ChMS data by that ministry's PCO tag
+  └── "kidsmin-cloud" as previously conceived may just be Spirely-cloud w/ kidsmin module enabled
+
+churchcred (separate product — compatible with, not dependent on, spirely/Inspire)
+  └── standalone: own DB, own identity fallback (lightweight person model)
+  └── when co-deployed with spirely: can read spirely for shared family/child identity instead
+  └── churchcred-cloud: same relationship, cloud-side — expected to stay a separate deployed app
+```
+
+**Current state (what's actually in the repos today):**
+
+```
+kidspire (gem) — not yet split into spirely + kidsmin
+  └── owns Rodauth/Account/Family/Child/Guardian/Invitation directly
+  └── owns PCO sync (ChurchIntegration, SyncSetting) directly
+  └── theme framework: view overrides + CSS variables
+  └── core logic reused by kidsmin-cloud
+
 churchcred (gem)
   └── standalone: own auth, own PCO, own DB
-  └── mountable alongside kidspire in host app
+  └── mountable alongside kidspire in host app (reads kidspire tables for identity when co-mounted)
   └── core logic reused by churchcred-cloud
-
-kidspire (gem)
-  └── standalone: Supabase Auth, own PCO, own DB
-  └── mountable alongside churchcred in host app
-  └── core logic reused by kidsmin-cloud
-  └── theme framework: view overrides + CSS variables
 
 kidsmin-cloud (platform)
   └── requires kidspire gem
-  └── Clerk SSO (replaces Supabase Auth)
+  └── Clerk SSO
   └── multi-tenant: schema-per-tenant Postgres
   └── PCO OAuth intermediary for all platform apps
   └── pilot tenant: account.jcc.kids
@@ -264,14 +309,24 @@ churchcred-cloud
 
 ## What Lives Where
 
+Target state (not yet built):
+
 | Concern | Lives in |
 |---|---|
-| Family profile, children records | kidspire |
-| Event listings, registrations | kidspire |
-| PCO people + calendar sync | kidspire |
-| Theme / view override system | kidspire |
-| Points, badges, leaderboard | churchcred |
+| Accounts, auth (Rodauth/JWT) | spirely core |
+| Family/guardian/child profile records, invitations | spirely core |
+| ChMS/PCO connection + sync config ("metadata") | spirely core — pending open question in `SPIRELY_CONTEXT.md` |
+| Ministry-specific event listings, registrations, brochure/theme site | Inspire module (e.g. kidsmin) |
+| Points, badges, leaderboard | churchcred (separate, compatible) |
 | PCO check-in sync → points | churchcred |
+
+Current state (kidspire not yet split):
+
+| Concern | Lives in |
+|---|---|
+| Accounts, auth, family/child/guardian/invitation records | kidspire (directly) |
+| Event listings, registrations, PCO sync, theme framework | kidspire (directly) |
+| Points, badges, leaderboard, PCO check-in sync | churchcred |
 | Platform SSO (Clerk) | kidsmin-cloud |
 | Platform PCO OAuth app | kidsmin-cloud |
 | Multi-tenancy (schema isolation) | kidsmin-cloud |
@@ -297,10 +352,12 @@ When working in any repo in this family:
 
 ## GitHub Org
 
-All repos live under: `github.com/chadjsdev`
+Repos live under `github.com/chadjsdev` and `github.com/5stones-io` (kidspire has moved to the
+`5stones-io` org — homepage `5stones.io/kidspire`; confirm current org per-repo before assuming).
 
+- `github.com/5stones-io/kidspire` — standalone gem ✓ (exists)
 - `github.com/chadjsdev/churchcred` — standalone gem ✓ (exists)
-- `github.com/chadjsdev/kidspire` — standalone gem (building)
+- `github.com/5stones-io/spirely` — standalone identity gem (proposed, not yet created)
 - `github.com/chadjsdev/kidsmin-cloud` — SaaS platform (building)
 - `github.com/chadjsdev/churchcred-cloud` — SaaS app (future)
 

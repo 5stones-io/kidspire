@@ -1,8 +1,8 @@
 module Kidspire
   class Registration < ApplicationRecord
-    belongs_to :family
+    belongs_to :family, class_name: "Spirely::Family"
     belongs_to :event
-    belongs_to :child
+    belongs_to :child, class_name: "Spirely::Child"
 
     validates :child_id, uniqueness: { scope: :event_id, message: "is already registered for this event" }
     validate  :child_belongs_to_family

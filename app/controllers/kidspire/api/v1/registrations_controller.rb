@@ -5,7 +5,9 @@ module Kidspire
         before_action :require_family!
 
         def create
-          registration = current_family.registrations.build(registration_params)
+          # Spirely::Family has no `registrations` association (Registration
+          # is kidspire-only) — build directly, scoped to the current family.
+          registration = Registration.new(registration_params.merge(family_id: current_family.id))
           if registration.save
             render json: RegistrationBlueprint.render(registration), status: :created
           else
@@ -15,7 +17,7 @@ module Kidspire
         end
 
         def destroy
-          registration = current_family.registrations.find(params[:id])
+          registration = Registration.find_by!(id: params[:id], family_id: current_family.id)
           registration.destroy
           head :no_content
         rescue ActiveRecord::RecordNotFound
